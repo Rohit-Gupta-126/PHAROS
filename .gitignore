@@ -1,11 +1,10 @@
-cat > .gitignore << 'EOF'
-   data/
-   *.h5
-   *.root
-   *.dat
-   __pycache__/
-   .env
-   *.ckpt
-   *.pt
-   .ipynb_checkpoints/
-   EOF
+data/
+*.h5
+*.root
+*.dat
+__pycache__/
+.env
+*.ckpt
+*.pt
+.ipynb_checkpoints/
+PHAROS_BUILD_PLAN.md
