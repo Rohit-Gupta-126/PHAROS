@@ -1,0 +1,28 @@
+PHAROS Phase 2 -- TMVA SOFIE availability probe
+generated: 2026-07-10T21:18:21.841535+00:00
+RESULT: SOFIE NOT AVAILABLE
+ROOT version: 6.38.00
+SOFIE parse/generate failed:
+Traceback (most recent call last):
+  File "/work/scripts/sofie_probe.py", line 34, in <module>
+    parser = ROOT.TMVA.Experimental.SOFIE.RModelParser_ONNX()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: <namespace cppyy.gbl.TMVA.Experimental.SOFIE at 0x47398b90> has no attribute 'RModelParser_ONNX'. Full details:
+  type object 'SOFIE' has no attribute 'RModelParser_ONNX'
+  'TMVA::Experimental::SOFIE::RModelParser_ONNX' is not a known C++ class
+  'RModelParser_ONNX' is not a known C++ template
+  'RModelParser_ONNX' is not a known C++ enum
+
+
+Follow-up library check (rootproject/root:latest, ROOT 6.38.00):
+  /opt/root/lib contains libROOTTMVASofie.so (SOFIE runtime) but NOT
+  libROOTTMVASofieParser.so, and `root-config --features` does not list
+  tmva-sofie. The ONNX parser needs protobuf at ROOT build time and was not
+  enabled in this image.
+
+Decision: building ROOT from source with -Dtmva-sofie=ON is a multi-hour,
+memory-heavy build -- too heavy for the 16 GB dev laptop (see
+docker/root-sofie.Dockerfile for the documented recipe to run elsewhere).
+Fallback per plan: ONNX Runtime is the runnable trigger-inference path
+(services/scorers/physics_scorer_sofie with --backend ort); SOFIE C++
+generation is documented future work.
