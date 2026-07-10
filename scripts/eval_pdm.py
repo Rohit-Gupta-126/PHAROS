@@ -7,8 +7,9 @@ error and IsolationForest) and, for each fault class, compute the AUC of
 Runnable via ``python -m scripts.eval_pdm --config configs/pdm_ae.yaml``
 (Makefile target ``eval-pdm``). Writes to ``reports/phase0/``:
 
-    pdm_auc.csv            - long table: system, fault_class, n, ae_auc, iso_auc
-    pdm_metrics.json       - same content, structured
+    pdm_auc.csv            - long table: system, fault_class, n, n_below_floor,
+                             ae_auc, iso_auc (labels merged by case/whitespace)
+    pdm_metrics.json       - {headline (median AUC over n>=5 classes), per_system}
     pdm_{system}_auc.png   - per-system bar chart of per-fault AE vs IsoForest AUC
 """
 from __future__ import annotations
@@ -41,9 +42,21 @@ DEFAULTS: Dict[str, Any] = {
     "target_len": 500,
     "max_pulses": None,
     "min_fault_samples": 3,   # skip fault classes with fewer samples
+    "headline_min_n": 5,      # floor for the median-AUC headline stat
     "seed": 1337,
     "device": None,
 }
+
+
+def _canon_fault(s: str) -> str:
+    """Canonicalize a fault-class label so case/whitespace variants merge.
+
+    e.g. "B FLUX Low Fault" and "B Flux Low Fault" both map to the same string,
+    as do "C FLUX Low Fault" / "C Flux Low Fault". We collapse internal
+    whitespace and title-case, which normalizes the FLUX/Flux and spacing
+    differences seen in the raw SNS labels without altering their meaning.
+    """
+    return " ".join(str(s).split()).title()
 
 
 def _merge(cfg: Dict[str, Any] | None) -> Dict[str, Any]:
@@ -93,6 +106,9 @@ def run(cfg: Dict[str, Any] | None = None) -> Dict[str, Any]:
         print(f"[eval-pdm] === {system} ===")
         sys_data = load_system(data_dir, system, target_len=c["target_len"],
                                max_pulses=c["max_pulses"])
+        # Merge case/whitespace-variant fault labels before aggregation.
+        sys_data.fault_type = np.array(
+            [_canon_fault(t) for t in sys_data.fault_type], dtype=object)
         norm = ChannelNormalizer.load(model_dir / "channel_norm.npz")
         ae = _load_ae(model_dir, device)
         iso_bundle = joblib.load(model_dir / "iso.joblib")
@@ -106,12 +122,13 @@ def run(cfg: Dict[str, Any] | None = None) -> Dict[str, Any]:
         normal = ~sys_data.is_fault
         ae_norm, iso_norm = ae_scores[normal], iso_scores[normal]
 
+        floor = c["headline_min_n"]
         system_rows = []
         # Overall: all faults vs normal.
         fault = sys_data.is_fault
         row_all = {
             "system": system, "fault_class": "ALL",
-            "n": int(fault.sum()),
+            "n": int(fault.sum()), "n_below_floor": False,
             "ae_auc": _auc(ae_norm, ae_scores[fault]),
             "iso_auc": _auc(iso_norm, iso_scores[fault]),
         }
@@ -124,6 +141,7 @@ def run(cfg: Dict[str, Any] | None = None) -> Dict[str, Any]:
                 continue
             row = {
                 "system": system, "fault_class": fclass, "n": n,
+                "n_below_floor": n < floor,
                 "ae_auc": _auc(ae_norm, ae_scores[mask]),
                 "iso_auc": _auc(iso_norm, iso_scores[mask]),
             }
@@ -135,18 +153,38 @@ def run(cfg: Dict[str, Any] | None = None) -> Dict[str, Any]:
               f"iso_auc={row_all['iso_auc']:.3f} "
               f"({len(system_rows) - 1} classes >= {c['min_fault_samples']})")
 
+    # Headline aggregate: median per-class AUC over classes with n >= floor
+    # (excludes the ALL row and noisy small-n classes).
+    floor = c["headline_min_n"]
+    headline_classes = [r for r in rows
+                        if r["fault_class"] != "ALL" and not r["n_below_floor"]]
+    headline = {
+        "headline_min_n": floor,
+        "n_classes_total": sum(1 for r in rows if r["fault_class"] != "ALL"),
+        "n_classes_in_headline": len(headline_classes),
+        "median_ae_auc": (float(np.median([r["ae_auc"] for r in headline_classes]))
+                          if headline_classes else None),
+        "median_iso_auc": (float(np.median([r["iso_auc"] for r in headline_classes]))
+                           if headline_classes else None),
+    }
+    print(f"[eval-pdm] headline (n>={floor}, {headline['n_classes_in_headline']}"
+          f"/{headline['n_classes_total']} classes): "
+          f"median AE={headline['median_ae_auc']} "
+          f"IsoForest={headline['median_iso_auc']}")
+
     _write_csv(rows, reports_dir / "pdm_auc.csv")
     (reports_dir / "pdm_metrics.json").write_text(
-        json.dumps(per_system, indent=2), encoding="utf-8")
+        json.dumps({"headline": headline, "per_system": per_system}, indent=2),
+        encoding="utf-8")
     print(f"[eval-pdm] wrote table + plots -> {reports_dir}")
-    return {"rows": rows}
+    return {"rows": rows, "headline": headline}
 
 
 def _write_csv(rows: List[Dict[str, Any]], path: Path) -> None:
     import csv
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["system", "fault_class", "n",
-                                          "ae_auc", "iso_auc"])
+                                          "n_below_floor", "ae_auc", "iso_auc"])
         w.writeheader()
         for r in rows:
             w.writerow({**r, "ae_auc": f"{r['ae_auc']:.4f}",

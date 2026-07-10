@@ -1,514 +1,587 @@
 {
-  "RFQ": [
-    {
-      "system": "RFQ",
-      "fault_class": "ALL",
-      "n": 182,
-      "ae_auc": 0.7956760630673675,
-      "iso_auc": 0.8236582258321389
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "+ DC I High Fault",
-      "n": 8,
-      "ae_auc": 0.9097826086956522,
-      "iso_auc": 0.9503623188405798
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "A FLUX Low Fault",
-      "n": 6,
-      "ae_auc": 0.7195652173913044,
-      "iso_auc": 0.7468599033816425
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "A- Driver Fault",
-      "n": 6,
-      "ae_auc": 0.6169082125603864,
-      "iso_auc": 0.5340579710144928
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "A-* Driver Fault",
-      "n": 26,
-      "ae_auc": 0.7914715719063546,
-      "iso_auc": 0.7877926421404682
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "C FLUX Low Fault",
-      "n": 6,
-      "ae_auc": 0.7698067632850242,
-      "iso_auc": 0.8328502415458937
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "DV/DT High Fault",
-      "n": 12,
-      "ae_auc": 0.9964975845410629,
-      "iso_auc": 0.992512077294686
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "Dump Switch Fault",
-      "n": 7,
-      "ae_auc": 0.9993788819875776,
-      "iso_auc": 0.9987577639751554
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "Fiber Fault",
-      "n": 21,
-      "ae_auc": 0.5796411318150448,
-      "iso_auc": 0.5338854382332643
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "SCR AC Input Fault",
-      "n": 12,
-      "ae_auc": 0.6983091787439614,
-      "iso_auc": 0.8130434782608695
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "SCR Firing Circ Fault",
-      "n": 8,
-      "ae_auc": 0.9994565217391305,
-      "iso_auc": 0.9978260869565218
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "SNS PPS Missing",
-      "n": 23,
-      "ae_auc": 0.8005671077504726,
-      "iso_auc": 0.861184625078765
-    },
-    {
-      "system": "RFQ",
-      "fault_class": "TPS Fault",
-      "n": 33,
-      "ae_auc": 0.8837066315327186,
-      "iso_auc": 0.9295564339042599
-    }
-  ],
-  "DTL": [
-    {
-      "system": "DTL",
-      "fault_class": "ALL",
-      "n": 159,
-      "ae_auc": 0.7573820583439526,
-      "iso_auc": 0.7727353694797277
-    },
-    {
-      "system": "DTL",
-      "fault_class": "A+* Driver Fault",
-      "n": 6,
-      "ae_auc": 0.6977124183006536,
-      "iso_auc": 0.891430646332607
-    },
-    {
-      "system": "DTL",
-      "fault_class": "B+* Driver Fault",
-      "n": 6,
-      "ae_auc": 1.0,
-      "iso_auc": 0.9694989106753812
-    },
-    {
-      "system": "DTL",
-      "fault_class": "C FLUX High Fault",
-      "n": 14,
-      "ae_auc": 0.5985838779956427,
-      "iso_auc": 0.756224712107065
-    },
-    {
-      "system": "DTL",
-      "fault_class": "C FLUX Low Fault",
-      "n": 4,
-      "ae_auc": 1.0,
-      "iso_auc": 0.9901960784313726
-    },
-    {
-      "system": "DTL",
-      "fault_class": "C+* Driver Fault",
-      "n": 3,
-      "ae_auc": 1.0,
-      "iso_auc": 0.9872912127814089
-    },
-    {
-      "system": "DTL",
-      "fault_class": "C+* IGBT I Low Fault",
-      "n": 4,
-      "ae_auc": 0.8126361655773421,
-      "iso_auc": 0.9572440087145969
-    },
-    {
-      "system": "DTL",
-      "fault_class": "DV/DT High Fault",
-      "n": 24,
-      "ae_auc": 0.96409767610748,
-      "iso_auc": 0.9901960784313726
-    },
-    {
-      "system": "DTL",
-      "fault_class": "DV/DT Low Fault",
-      "n": 7,
-      "ae_auc": 1.0,
-      "iso_auc": 0.9943977591036415
-    },
-    {
-      "system": "DTL",
-      "fault_class": "Fiber Fault",
-      "n": 61,
-      "ae_auc": 0.5842351512554019,
-      "iso_auc": 0.5168398871388263
-    },
-    {
-      "system": "DTL",
-      "fault_class": "MOD I High Fault",
-      "n": 5,
-      "ae_auc": 0.8651416122004357,
-      "iso_auc": 0.9762527233115468
-    },
-    {
-      "system": "DTL",
-      "fault_class": "SCR AC Input Fault",
-      "n": 21,
-      "ae_auc": 0.8687104471418197,
-      "iso_auc": 0.9308538230106856
-    }
-  ],
-  "CCL": [
-    {
-      "system": "CCL",
-      "fault_class": "ALL",
-      "n": 305,
-      "ae_auc": 0.581776330563665,
-      "iso_auc": 0.7477430945430048
-    },
-    {
-      "system": "CCL",
-      "fault_class": "+ CB V High Fault",
-      "n": 3,
-      "ae_auc": 0.5468036529680366,
-      "iso_auc": 0.7515220700152208
-    },
-    {
-      "system": "CCL",
-      "fault_class": "A+ IGBT I Low Fault",
-      "n": 14,
-      "ae_auc": 0.4397423352902805,
-      "iso_auc": 0.5083577951728637
-    },
-    {
-      "system": "CCL",
-      "fault_class": "B + Driver Fault",
-      "n": 4,
-      "ae_auc": 0.5306792237442922,
-      "iso_auc": 0.6894977168949772
-    },
-    {
-      "system": "CCL",
-      "fault_class": "B+ IGBT I Low Fault",
-      "n": 18,
-      "ae_auc": 0.8820078640284119,
-      "iso_auc": 0.9108003551496702
-    },
-    {
-      "system": "CCL",
-      "fault_class": "B+* IGBT I Low Fault",
-      "n": 4,
-      "ae_auc": 0.9974315068493151,
-      "iso_auc": 0.9667522831050228
-    },
-    {
-      "system": "CCL",
-      "fault_class": "B- Driver Fault",
-      "n": 14,
-      "ae_auc": 0.5001630789302022,
-      "iso_auc": 0.4209067188519243
-    },
-    {
-      "system": "CCL",
-      "fault_class": "B-* Driver Fault",
-      "n": 14,
-      "ae_auc": 0.8167808219178081,
-      "iso_auc": 0.8974233529028051
-    },
-    {
-      "system": "CCL",
-      "fault_class": "C FLUX High Fault",
-      "n": 8,
-      "ae_auc": 0.8331906392694064,
-      "iso_auc": 0.6290667808219178
-    },
-    {
-      "system": "CCL",
-      "fault_class": "C FLUX Low Fault",
-      "n": 10,
-      "ae_auc": 0.6129566210045663,
-      "iso_auc": 0.9503995433789955
-    },
-    {
-      "system": "CCL",
-      "fault_class": "C- Driver Fault",
-      "n": 3,
-      "ae_auc": 1.0,
-      "iso_auc": 1.0
-    },
-    {
-      "system": "CCL",
-      "fault_class": "DV/DT High Fault",
-      "n": 22,
-      "ae_auc": 0.43023557492735576,
-      "iso_auc": 0.9675695309256953
-    },
-    {
-      "system": "CCL",
-      "fault_class": "DV/DT Low Fault",
-      "n": 4,
-      "ae_auc": 0.9317922374429224,
-      "iso_auc": 0.9668949771689498
-    },
-    {
-      "system": "CCL",
-      "fault_class": "EPICS HeartBt Fault",
-      "n": 4,
-      "ae_auc": 0.4778824200913242,
-      "iso_auc": 1.0
-    },
-    {
-      "system": "CCL",
-      "fault_class": "Fiber Fault",
-      "n": 77,
-      "ae_auc": 0.4453537330249659,
-      "iso_auc": 0.5161003380181461
-    },
-    {
-      "system": "CCL",
-      "fault_class": "Interpulse High Fault",
-      "n": 5,
-      "ae_auc": 0.6348173515981735,
-      "iso_auc": 0.7776255707762557
-    },
-    {
-      "system": "CCL",
-      "fault_class": "MOD I High Fault",
-      "n": 12,
-      "ae_auc": 0.6421708523592085,
-      "iso_auc": 0.7714516742770167
-    },
-    {
-      "system": "CCL",
-      "fault_class": "MOD V High Fault",
-      "n": 8,
-      "ae_auc": 0.6688784246575342,
-      "iso_auc": 0.9764554794520548
-    },
-    {
-      "system": "CCL",
-      "fault_class": "O Panel- Local Check",
-      "n": 4,
-      "ae_auc": 0.057791095890410954,
-      "iso_auc": 1.0
-    },
-    {
-      "system": "CCL",
-      "fault_class": "SCR AC Input Fault",
-      "n": 48,
-      "ae_auc": 0.6146071156773212,
-      "iso_auc": 0.8785792427701675
-    },
-    {
-      "system": "CCL",
-      "fault_class": "SNS PPS Missing",
-      "n": 6,
-      "ae_auc": 0.3284817351598173,
-      "iso_auc": 0.606830289193303
-    }
-  ],
-  "SCL": [
-    {
-      "system": "SCL",
-      "fault_class": "ALL",
-      "n": 704,
-      "ae_auc": 0.6801775823528038,
-      "iso_auc": 0.761071447331559
-    },
-    {
-      "system": "SCL",
-      "fault_class": "+ CB I High Fault",
-      "n": 3,
-      "ae_auc": 0.6942304399931518,
-      "iso_auc": 0.733949666153056
-    },
-    {
-      "system": "SCL",
-      "fault_class": "+ CB I Low Fault",
-      "n": 3,
-      "ae_auc": 0.9732066426981681,
-      "iso_auc": 0.9989727786337955
-    },
-    {
-      "system": "SCL",
-      "fault_class": "+ CB V High Fault",
-      "n": 16,
-      "ae_auc": 0.8205893682588598,
-      "iso_auc": 0.7655206728299949
-    },
-    {
-      "system": "SCL",
-      "fault_class": "+ DC I High Fault",
-      "n": 7,
-      "ae_auc": 0.27944089808496586,
-      "iso_auc": 0.6475163254824272
-    },
-    {
-      "system": "SCL",
-      "fault_class": "- CB I High Fault",
-      "n": 4,
-      "ae_auc": 0.5096302003081664,
-      "iso_auc": 0.5607344632768362
-    },
-    {
-      "system": "SCL",
-      "fault_class": "- CB V Low Fault",
-      "n": 10,
-      "ae_auc": 0.6964304057524395,
-      "iso_auc": 0.7809450436569081
-    },
-    {
-      "system": "SCL",
-      "fault_class": "- DC I Low Fault",
-      "n": 7,
-      "ae_auc": 0.3920683835938073,
-      "iso_auc": 0.6240002934918188
-    },
-    {
-      "system": "SCL",
-      "fault_class": "B FLUX Low Fault",
-      "n": 6,
-      "ae_auc": 0.7303971922615992,
-      "iso_auc": 0.7612994350282485
-    },
-    {
-      "system": "SCL",
-      "fault_class": "B Flux Low Fault",
-      "n": 3,
-      "ae_auc": 0.6489470980996405,
-      "iso_auc": 0.8336757404554015
-    },
-    {
-      "system": "SCL",
-      "fault_class": "B+ IGBT I Low Fault",
-      "n": 4,
-      "ae_auc": 0.29558294812532104,
-      "iso_auc": 0.3376990241397021
-    },
-    {
-      "system": "SCL",
-      "fault_class": "B- Driver Fault",
-      "n": 15,
-      "ae_auc": 0.7663756206129088,
-      "iso_auc": 0.5452491011813045
-    },
-    {
-      "system": "SCL",
-      "fault_class": "B-* Driver Fault",
-      "n": 16,
-      "ae_auc": 0.873282614278377,
-      "iso_auc": 0.7534668721109399
-    },
-    {
-      "system": "SCL",
-      "fault_class": "C FLUX Low Fault",
-      "n": 17,
-      "ae_auc": 0.7415782954167799,
-      "iso_auc": 0.8369890329012961
-    },
-    {
-      "system": "SCL",
-      "fault_class": "C Flux Low Fault",
-      "n": 5,
-      "ae_auc": 0.9936825885978428,
-      "iso_auc": 0.8610683102208527
-    },
-    {
-      "system": "SCL",
-      "fault_class": "C-* Driver Fault",
-      "n": 8,
-      "ae_auc": 0.8674884437596302,
-      "iso_auc": 0.8944530046224961
-    },
-    {
-      "system": "SCL",
-      "fault_class": "DV/DT High Fault",
-      "n": 80,
-      "ae_auc": 0.561302645095018,
-      "iso_auc": 0.9977978941961994
-    },
-    {
-      "system": "SCL",
-      "fault_class": "DV/DT Low Fault",
-      "n": 40,
-      "ae_auc": 0.7945428864920391,
-      "iso_auc": 0.7968926553672316
-    },
-    {
-      "system": "SCL",
-      "fault_class": "Fiber Fault",
-      "n": 260,
-      "ae_auc": 0.638573150013828,
-      "iso_auc": 0.6358480502548298
-    },
-    {
-      "system": "SCL",
-      "fault_class": "Gate Duty Cycl Fault",
-      "n": 3,
-      "ae_auc": 0.4123437767505564,
-      "iso_auc": 0.9946926896079438
-    },
-    {
-      "system": "SCL",
-      "fault_class": "Gate PW Low Fault",
-      "n": 20,
-      "ae_auc": 0.4203775038520801,
-      "iso_auc": 0.9942860811504879
-    },
-    {
-      "system": "SCL",
-      "fault_class": "IGBT B+* Low Fault",
-      "n": 13,
-      "ae_auc": 0.9789419619928095,
-      "iso_auc": 0.21291138240290783
-    },
-    {
-      "system": "SCL",
-      "fault_class": "MOD I High Fault",
-      "n": 8,
-      "ae_auc": 0.5833012326656395,
-      "iso_auc": 0.5985811504879301
-    },
-    {
-      "system": "SCL",
-      "fault_class": "SCR AC Input Fault",
-      "n": 34,
-      "ae_auc": 0.4184869633523672,
-      "iso_auc": 0.7679008429257681
-    },
-    {
-      "system": "SCL",
-      "fault_class": "SCR AC Phase Fault",
-      "n": 3,
-      "ae_auc": 0.6200992980653998,
-      "iso_auc": 0.7009073788734805
-    },
-    {
-      "system": "SCL",
-      "fault_class": "SNS PPS Missing",
-      "n": 97,
-      "ae_auc": 0.909515829269455,
-      "iso_auc": 0.9402861393949984
-    }
-  ]
+  "headline": {
+    "headline_min_n": 5,
+    "n_classes_total": 67,
+    "n_classes_in_headline": 50,
+    "median_ae_auc": 0.711406189132792,
+    "median_iso_auc": 0.8049680668140506
+  },
+  "per_system": {
+    "RFQ": [
+      {
+        "system": "RFQ",
+        "fault_class": "ALL",
+        "n": 182,
+        "n_below_floor": false,
+        "ae_auc": 0.7956760630673675,
+        "iso_auc": 0.8236582258321389
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "+ Dc I High Fault",
+        "n": 8,
+        "n_below_floor": false,
+        "ae_auc": 0.9097826086956522,
+        "iso_auc": 0.9503623188405798
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "A Flux Low Fault",
+        "n": 6,
+        "n_below_floor": false,
+        "ae_auc": 0.7195652173913044,
+        "iso_auc": 0.7468599033816425
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "A- Driver Fault",
+        "n": 6,
+        "n_below_floor": false,
+        "ae_auc": 0.6169082125603864,
+        "iso_auc": 0.5340579710144928
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "A-* Driver Fault",
+        "n": 26,
+        "n_below_floor": false,
+        "ae_auc": 0.7914715719063546,
+        "iso_auc": 0.7877926421404682
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "C Flux Low Fault",
+        "n": 6,
+        "n_below_floor": false,
+        "ae_auc": 0.7698067632850242,
+        "iso_auc": 0.8328502415458937
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "Dump Switch Fault",
+        "n": 7,
+        "n_below_floor": false,
+        "ae_auc": 0.9993788819875776,
+        "iso_auc": 0.9987577639751554
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "Dv/Dt High Fault",
+        "n": 12,
+        "n_below_floor": false,
+        "ae_auc": 0.9964975845410629,
+        "iso_auc": 0.992512077294686
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "Fiber Fault",
+        "n": 21,
+        "n_below_floor": false,
+        "ae_auc": 0.5796411318150448,
+        "iso_auc": 0.5338854382332643
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "Scr Ac Input Fault",
+        "n": 12,
+        "n_below_floor": false,
+        "ae_auc": 0.6983091787439614,
+        "iso_auc": 0.8130434782608695
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "Scr Firing Circ Fault",
+        "n": 8,
+        "n_below_floor": false,
+        "ae_auc": 0.9994565217391305,
+        "iso_auc": 0.9978260869565218
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "Sns Pps Missing",
+        "n": 23,
+        "n_below_floor": false,
+        "ae_auc": 0.8005671077504726,
+        "iso_auc": 0.861184625078765
+      },
+      {
+        "system": "RFQ",
+        "fault_class": "Tps Fault",
+        "n": 33,
+        "n_below_floor": false,
+        "ae_auc": 0.8837066315327186,
+        "iso_auc": 0.9295564339042599
+      }
+    ],
+    "DTL": [
+      {
+        "system": "DTL",
+        "fault_class": "ALL",
+        "n": 159,
+        "n_below_floor": false,
+        "ae_auc": 0.7573820583439526,
+        "iso_auc": 0.7727353694797277
+      },
+      {
+        "system": "DTL",
+        "fault_class": "A+* Driver Fault",
+        "n": 6,
+        "n_below_floor": false,
+        "ae_auc": 0.6977124183006536,
+        "iso_auc": 0.891430646332607
+      },
+      {
+        "system": "DTL",
+        "fault_class": "B+* Driver Fault",
+        "n": 6,
+        "n_below_floor": false,
+        "ae_auc": 1.0,
+        "iso_auc": 0.9694989106753812
+      },
+      {
+        "system": "DTL",
+        "fault_class": "C Flux High Fault",
+        "n": 14,
+        "n_below_floor": false,
+        "ae_auc": 0.5985838779956427,
+        "iso_auc": 0.756224712107065
+      },
+      {
+        "system": "DTL",
+        "fault_class": "C Flux Low Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 1.0,
+        "iso_auc": 0.9901960784313726
+      },
+      {
+        "system": "DTL",
+        "fault_class": "C+* Driver Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 1.0,
+        "iso_auc": 0.9872912127814089
+      },
+      {
+        "system": "DTL",
+        "fault_class": "C+* Igbt I Low Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.8126361655773421,
+        "iso_auc": 0.9572440087145969
+      },
+      {
+        "system": "DTL",
+        "fault_class": "Dv/Dt High Fault",
+        "n": 24,
+        "n_below_floor": false,
+        "ae_auc": 0.96409767610748,
+        "iso_auc": 0.9901960784313726
+      },
+      {
+        "system": "DTL",
+        "fault_class": "Dv/Dt Low Fault",
+        "n": 7,
+        "n_below_floor": false,
+        "ae_auc": 1.0,
+        "iso_auc": 0.9943977591036415
+      },
+      {
+        "system": "DTL",
+        "fault_class": "Fiber Fault",
+        "n": 61,
+        "n_below_floor": false,
+        "ae_auc": 0.5842351512554019,
+        "iso_auc": 0.5168398871388263
+      },
+      {
+        "system": "DTL",
+        "fault_class": "Mod I High Fault",
+        "n": 5,
+        "n_below_floor": false,
+        "ae_auc": 0.8651416122004357,
+        "iso_auc": 0.9762527233115468
+      },
+      {
+        "system": "DTL",
+        "fault_class": "Scr Ac Input Fault",
+        "n": 21,
+        "n_below_floor": false,
+        "ae_auc": 0.8687104471418197,
+        "iso_auc": 0.9308538230106856
+      }
+    ],
+    "CCL": [
+      {
+        "system": "CCL",
+        "fault_class": "ALL",
+        "n": 305,
+        "n_below_floor": false,
+        "ae_auc": 0.581776330563665,
+        "iso_auc": 0.7477430945430048
+      },
+      {
+        "system": "CCL",
+        "fault_class": "+ Cb V High Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 0.5468036529680366,
+        "iso_auc": 0.7515220700152208
+      },
+      {
+        "system": "CCL",
+        "fault_class": "A+ Igbt I Low Fault",
+        "n": 14,
+        "n_below_floor": false,
+        "ae_auc": 0.4397423352902805,
+        "iso_auc": 0.5083577951728637
+      },
+      {
+        "system": "CCL",
+        "fault_class": "B + Driver Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.5306792237442922,
+        "iso_auc": 0.6894977168949772
+      },
+      {
+        "system": "CCL",
+        "fault_class": "B+ Igbt I Low Fault",
+        "n": 18,
+        "n_below_floor": false,
+        "ae_auc": 0.8820078640284119,
+        "iso_auc": 0.9108003551496702
+      },
+      {
+        "system": "CCL",
+        "fault_class": "B+* Igbt I Low Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.9974315068493151,
+        "iso_auc": 0.9667522831050228
+      },
+      {
+        "system": "CCL",
+        "fault_class": "B- Driver Fault",
+        "n": 14,
+        "n_below_floor": false,
+        "ae_auc": 0.5001630789302022,
+        "iso_auc": 0.4209067188519243
+      },
+      {
+        "system": "CCL",
+        "fault_class": "B-* Driver Fault",
+        "n": 14,
+        "n_below_floor": false,
+        "ae_auc": 0.8167808219178081,
+        "iso_auc": 0.8974233529028051
+      },
+      {
+        "system": "CCL",
+        "fault_class": "C Flux High Fault",
+        "n": 8,
+        "n_below_floor": false,
+        "ae_auc": 0.8331906392694064,
+        "iso_auc": 0.6290667808219178
+      },
+      {
+        "system": "CCL",
+        "fault_class": "C Flux Low Fault",
+        "n": 10,
+        "n_below_floor": false,
+        "ae_auc": 0.6129566210045663,
+        "iso_auc": 0.9503995433789955
+      },
+      {
+        "system": "CCL",
+        "fault_class": "C- Driver Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 1.0,
+        "iso_auc": 1.0
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Dv/Dt High Fault",
+        "n": 22,
+        "n_below_floor": false,
+        "ae_auc": 0.43023557492735576,
+        "iso_auc": 0.9675695309256953
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Dv/Dt Low Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.9317922374429224,
+        "iso_auc": 0.9668949771689498
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Epics Heartbt Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.4778824200913242,
+        "iso_auc": 1.0
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Fiber Fault",
+        "n": 77,
+        "n_below_floor": false,
+        "ae_auc": 0.4453537330249659,
+        "iso_auc": 0.5161003380181461
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Interpulse High Fault",
+        "n": 5,
+        "n_below_floor": false,
+        "ae_auc": 0.6348173515981735,
+        "iso_auc": 0.7776255707762557
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Mod I High Fault",
+        "n": 12,
+        "n_below_floor": false,
+        "ae_auc": 0.6421708523592085,
+        "iso_auc": 0.7714516742770167
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Mod V High Fault",
+        "n": 8,
+        "n_below_floor": false,
+        "ae_auc": 0.6688784246575342,
+        "iso_auc": 0.9764554794520548
+      },
+      {
+        "system": "CCL",
+        "fault_class": "O Panel- Local Check",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.057791095890410954,
+        "iso_auc": 1.0
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Scr Ac Input Fault",
+        "n": 48,
+        "n_below_floor": false,
+        "ae_auc": 0.6146071156773212,
+        "iso_auc": 0.8785792427701675
+      },
+      {
+        "system": "CCL",
+        "fault_class": "Sns Pps Missing",
+        "n": 6,
+        "n_below_floor": false,
+        "ae_auc": 0.3284817351598173,
+        "iso_auc": 0.606830289193303
+      }
+    ],
+    "SCL": [
+      {
+        "system": "SCL",
+        "fault_class": "ALL",
+        "n": 704,
+        "n_below_floor": false,
+        "ae_auc": 0.6801775823528038,
+        "iso_auc": 0.761071447331559
+      },
+      {
+        "system": "SCL",
+        "fault_class": "+ Cb I High Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 0.6942304399931518,
+        "iso_auc": 0.733949666153056
+      },
+      {
+        "system": "SCL",
+        "fault_class": "+ Cb I Low Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 0.9732066426981681,
+        "iso_auc": 0.9989727786337955
+      },
+      {
+        "system": "SCL",
+        "fault_class": "+ Cb V High Fault",
+        "n": 16,
+        "n_below_floor": false,
+        "ae_auc": 0.8205893682588598,
+        "iso_auc": 0.7655206728299949
+      },
+      {
+        "system": "SCL",
+        "fault_class": "+ Dc I High Fault",
+        "n": 7,
+        "n_below_floor": false,
+        "ae_auc": 0.27944089808496586,
+        "iso_auc": 0.6475163254824272
+      },
+      {
+        "system": "SCL",
+        "fault_class": "- Cb I High Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.5096302003081664,
+        "iso_auc": 0.5607344632768362
+      },
+      {
+        "system": "SCL",
+        "fault_class": "- Cb V Low Fault",
+        "n": 10,
+        "n_below_floor": false,
+        "ae_auc": 0.6964304057524395,
+        "iso_auc": 0.7809450436569081
+      },
+      {
+        "system": "SCL",
+        "fault_class": "- Dc I Low Fault",
+        "n": 7,
+        "n_below_floor": false,
+        "ae_auc": 0.3920683835938073,
+        "iso_auc": 0.6240002934918188
+      },
+      {
+        "system": "SCL",
+        "fault_class": "B Flux Low Fault",
+        "n": 9,
+        "n_below_floor": false,
+        "ae_auc": 0.7032471608742795,
+        "iso_auc": 0.7854248701706328
+      },
+      {
+        "system": "SCL",
+        "fault_class": "B+ Igbt I Low Fault",
+        "n": 4,
+        "n_below_floor": true,
+        "ae_auc": 0.29558294812532104,
+        "iso_auc": 0.3376990241397021
+      },
+      {
+        "system": "SCL",
+        "fault_class": "B- Driver Fault",
+        "n": 15,
+        "n_below_floor": false,
+        "ae_auc": 0.7663756206129088,
+        "iso_auc": 0.5452491011813045
+      },
+      {
+        "system": "SCL",
+        "fault_class": "B-* Driver Fault",
+        "n": 16,
+        "n_below_floor": false,
+        "ae_auc": 0.873282614278377,
+        "iso_auc": 0.7534668721109399
+      },
+      {
+        "system": "SCL",
+        "fault_class": "C Flux High Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 0.6737716144495804,
+        "iso_auc": 0.6803629515493922
+      },
+      {
+        "system": "SCL",
+        "fault_class": "C Flux Low Fault",
+        "n": 22,
+        "n_below_floor": false,
+        "ae_auc": 0.7988747256852033,
+        "iso_auc": 0.842461595928468
+      },
+      {
+        "system": "SCL",
+        "fault_class": "C-* Driver Fault",
+        "n": 8,
+        "n_below_floor": false,
+        "ae_auc": 0.8674884437596302,
+        "iso_auc": 0.8944530046224961
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Dv/Dt High Fault",
+        "n": 80,
+        "n_below_floor": false,
+        "ae_auc": 0.561302645095018,
+        "iso_auc": 0.9977978941961994
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Dv/Dt Low Fault",
+        "n": 40,
+        "n_below_floor": false,
+        "ae_auc": 0.7945428864920391,
+        "iso_auc": 0.7968926553672316
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Fiber Fault",
+        "n": 260,
+        "n_below_floor": false,
+        "ae_auc": 0.638573150013828,
+        "iso_auc": 0.6358480502548298
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Gate Duty Cycl Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 0.4123437767505564,
+        "iso_auc": 0.9946926896079438
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Gate Pw Low Fault",
+        "n": 20,
+        "n_below_floor": false,
+        "ae_auc": 0.4203775038520801,
+        "iso_auc": 0.9942860811504879
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Igbt B+* Low Fault",
+        "n": 13,
+        "n_below_floor": false,
+        "ae_auc": 0.9789419619928095,
+        "iso_auc": 0.21291138240290783
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Mod I High Fault",
+        "n": 8,
+        "n_below_floor": false,
+        "ae_auc": 0.5833012326656395,
+        "iso_auc": 0.5985811504879301
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Scr Ac Input Fault",
+        "n": 34,
+        "n_below_floor": false,
+        "ae_auc": 0.4184869633523672,
+        "iso_auc": 0.7679008429257681
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Scr Ac Phase Fault",
+        "n": 3,
+        "n_below_floor": true,
+        "ae_auc": 0.6200992980653998,
+        "iso_auc": 0.7009073788734805
+      },
+      {
+        "system": "SCL",
+        "fault_class": "Sns Pps Missing",
+        "n": 97,
+        "n_below_floor": false,
+        "ae_auc": 0.909515829269455,
+        "iso_auc": 0.9402861393949984
+      }
+    ]
+  }
 }

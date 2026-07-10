@@ -1,73 +1,72 @@
-system,fault_class,n,ae_auc,iso_auc
-RFQ,ALL,182,0.7957,0.8237
-RFQ,+ DC I High Fault,8,0.9098,0.9504
-RFQ,A FLUX Low Fault,6,0.7196,0.7469
-RFQ,A- Driver Fault,6,0.6169,0.5341
-RFQ,A-* Driver Fault,26,0.7915,0.7878
-RFQ,C FLUX Low Fault,6,0.7698,0.8329
-RFQ,DV/DT High Fault,12,0.9965,0.9925
-RFQ,Dump Switch Fault,7,0.9994,0.9988
-RFQ,Fiber Fault,21,0.5796,0.5339
-RFQ,SCR AC Input Fault,12,0.6983,0.8130
-RFQ,SCR Firing Circ Fault,8,0.9995,0.9978
-RFQ,SNS PPS Missing,23,0.8006,0.8612
-RFQ,TPS Fault,33,0.8837,0.9296
-DTL,ALL,159,0.7574,0.7727
-DTL,A+* Driver Fault,6,0.6977,0.8914
-DTL,B+* Driver Fault,6,1.0000,0.9695
-DTL,C FLUX High Fault,14,0.5986,0.7562
-DTL,C FLUX Low Fault,4,1.0000,0.9902
-DTL,C+* Driver Fault,3,1.0000,0.9873
-DTL,C+* IGBT I Low Fault,4,0.8126,0.9572
-DTL,DV/DT High Fault,24,0.9641,0.9902
-DTL,DV/DT Low Fault,7,1.0000,0.9944
-DTL,Fiber Fault,61,0.5842,0.5168
-DTL,MOD I High Fault,5,0.8651,0.9763
-DTL,SCR AC Input Fault,21,0.8687,0.9309
-CCL,ALL,305,0.5818,0.7477
-CCL,+ CB V High Fault,3,0.5468,0.7515
-CCL,A+ IGBT I Low Fault,14,0.4397,0.5084
-CCL,B + Driver Fault,4,0.5307,0.6895
-CCL,B+ IGBT I Low Fault,18,0.8820,0.9108
-CCL,B+* IGBT I Low Fault,4,0.9974,0.9668
-CCL,B- Driver Fault,14,0.5002,0.4209
-CCL,B-* Driver Fault,14,0.8168,0.8974
-CCL,C FLUX High Fault,8,0.8332,0.6291
-CCL,C FLUX Low Fault,10,0.6130,0.9504
-CCL,C- Driver Fault,3,1.0000,1.0000
-CCL,DV/DT High Fault,22,0.4302,0.9676
-CCL,DV/DT Low Fault,4,0.9318,0.9669
-CCL,EPICS HeartBt Fault,4,0.4779,1.0000
-CCL,Fiber Fault,77,0.4454,0.5161
-CCL,Interpulse High Fault,5,0.6348,0.7776
-CCL,MOD I High Fault,12,0.6422,0.7715
-CCL,MOD V High Fault,8,0.6689,0.9765
-CCL,O Panel- Local Check,4,0.0578,1.0000
-CCL,SCR AC Input Fault,48,0.6146,0.8786
-CCL,SNS PPS Missing,6,0.3285,0.6068
-SCL,ALL,704,0.6802,0.7611
-SCL,+ CB I High Fault,3,0.6942,0.7339
-SCL,+ CB I Low Fault,3,0.9732,0.9990
-SCL,+ CB V High Fault,16,0.8206,0.7655
-SCL,+ DC I High Fault,7,0.2794,0.6475
-SCL,- CB I High Fault,4,0.5096,0.5607
-SCL,- CB V Low Fault,10,0.6964,0.7809
-SCL,- DC I Low Fault,7,0.3921,0.6240
-SCL,B FLUX Low Fault,6,0.7304,0.7613
-SCL,B Flux Low Fault,3,0.6489,0.8337
-SCL,B+ IGBT I Low Fault,4,0.2956,0.3377
-SCL,B- Driver Fault,15,0.7664,0.5452
-SCL,B-* Driver Fault,16,0.8733,0.7535
-SCL,C FLUX Low Fault,17,0.7416,0.8370
-SCL,C Flux Low Fault,5,0.9937,0.8611
-SCL,C-* Driver Fault,8,0.8675,0.8945
-SCL,DV/DT High Fault,80,0.5613,0.9978
-SCL,DV/DT Low Fault,40,0.7945,0.7969
-SCL,Fiber Fault,260,0.6386,0.6358
-SCL,Gate Duty Cycl Fault,3,0.4123,0.9947
-SCL,Gate PW Low Fault,20,0.4204,0.9943
-SCL,IGBT B+* Low Fault,13,0.9789,0.2129
-SCL,MOD I High Fault,8,0.5833,0.5986
-SCL,SCR AC Input Fault,34,0.4185,0.7679
-SCL,SCR AC Phase Fault,3,0.6201,0.7009
-SCL,SNS PPS Missing,97,0.9095,0.9403
+system,fault_class,n,n_below_floor,ae_auc,iso_auc
+RFQ,ALL,182,False,0.7957,0.8237
+RFQ,+ Dc I High Fault,8,False,0.9098,0.9504
+RFQ,A Flux Low Fault,6,False,0.7196,0.7469
+RFQ,A- Driver Fault,6,False,0.6169,0.5341
+RFQ,A-* Driver Fault,26,False,0.7915,0.7878
+RFQ,C Flux Low Fault,6,False,0.7698,0.8329
+RFQ,Dump Switch Fault,7,False,0.9994,0.9988
+RFQ,Dv/Dt High Fault,12,False,0.9965,0.9925
+RFQ,Fiber Fault,21,False,0.5796,0.5339
+RFQ,Scr Ac Input Fault,12,False,0.6983,0.8130
+RFQ,Scr Firing Circ Fault,8,False,0.9995,0.9978
+RFQ,Sns Pps Missing,23,False,0.8006,0.8612
+RFQ,Tps Fault,33,False,0.8837,0.9296
+DTL,ALL,159,False,0.7574,0.7727
+DTL,A+* Driver Fault,6,False,0.6977,0.8914
+DTL,B+* Driver Fault,6,False,1.0000,0.9695
+DTL,C Flux High Fault,14,False,0.5986,0.7562
+DTL,C Flux Low Fault,4,True,1.0000,0.9902
+DTL,C+* Driver Fault,3,True,1.0000,0.9873
+DTL,C+* Igbt I Low Fault,4,True,0.8126,0.9572
+DTL,Dv/Dt High Fault,24,False,0.9641,0.9902
+DTL,Dv/Dt Low Fault,7,False,1.0000,0.9944
+DTL,Fiber Fault,61,False,0.5842,0.5168
+DTL,Mod I High Fault,5,False,0.8651,0.9763
+DTL,Scr Ac Input Fault,21,False,0.8687,0.9309
+CCL,ALL,305,False,0.5818,0.7477
+CCL,+ Cb V High Fault,3,True,0.5468,0.7515
+CCL,A+ Igbt I Low Fault,14,False,0.4397,0.5084
+CCL,B + Driver Fault,4,True,0.5307,0.6895
+CCL,B+ Igbt I Low Fault,18,False,0.8820,0.9108
+CCL,B+* Igbt I Low Fault,4,True,0.9974,0.9668
+CCL,B- Driver Fault,14,False,0.5002,0.4209
+CCL,B-* Driver Fault,14,False,0.8168,0.8974
+CCL,C Flux High Fault,8,False,0.8332,0.6291
+CCL,C Flux Low Fault,10,False,0.6130,0.9504
+CCL,C- Driver Fault,3,True,1.0000,1.0000
+CCL,Dv/Dt High Fault,22,False,0.4302,0.9676
+CCL,Dv/Dt Low Fault,4,True,0.9318,0.9669
+CCL,Epics Heartbt Fault,4,True,0.4779,1.0000
+CCL,Fiber Fault,77,False,0.4454,0.5161
+CCL,Interpulse High Fault,5,False,0.6348,0.7776
+CCL,Mod I High Fault,12,False,0.6422,0.7715
+CCL,Mod V High Fault,8,False,0.6689,0.9765
+CCL,O Panel- Local Check,4,True,0.0578,1.0000
+CCL,Scr Ac Input Fault,48,False,0.6146,0.8786
+CCL,Sns Pps Missing,6,False,0.3285,0.6068
+SCL,ALL,704,False,0.6802,0.7611
+SCL,+ Cb I High Fault,3,True,0.6942,0.7339
+SCL,+ Cb I Low Fault,3,True,0.9732,0.9990
+SCL,+ Cb V High Fault,16,False,0.8206,0.7655
+SCL,+ Dc I High Fault,7,False,0.2794,0.6475
+SCL,- Cb I High Fault,4,True,0.5096,0.5607
+SCL,- Cb V Low Fault,10,False,0.6964,0.7809
+SCL,- Dc I Low Fault,7,False,0.3921,0.6240
+SCL,B Flux Low Fault,9,False,0.7032,0.7854
+SCL,B+ Igbt I Low Fault,4,True,0.2956,0.3377
+SCL,B- Driver Fault,15,False,0.7664,0.5452
+SCL,B-* Driver Fault,16,False,0.8733,0.7535
+SCL,C Flux High Fault,3,True,0.6738,0.6804
+SCL,C Flux Low Fault,22,False,0.7989,0.8425
+SCL,C-* Driver Fault,8,False,0.8675,0.8945
+SCL,Dv/Dt High Fault,80,False,0.5613,0.9978
+SCL,Dv/Dt Low Fault,40,False,0.7945,0.7969
+SCL,Fiber Fault,260,False,0.6386,0.6358
+SCL,Gate Duty Cycl Fault,3,True,0.4123,0.9947
+SCL,Gate Pw Low Fault,20,False,0.4204,0.9943
+SCL,Igbt B+* Low Fault,13,False,0.9789,0.2129
+SCL,Mod I High Fault,8,False,0.5833,0.5986
+SCL,Scr Ac Input Fault,34,False,0.4185,0.7679
+SCL,Scr Ac Phase Fault,3,True,0.6201,0.7009
+SCL,Sns Pps Missing,97,False,0.9095,0.9403
