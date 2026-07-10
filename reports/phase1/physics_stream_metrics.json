@@ -1,0 +1,20 @@
+{
+  "stream": "physics",
+  "n_messages": 10000,
+  "n_kept": 99,
+  "keep_rate": 0.0099,
+  "throughput_msgs_per_sec": 504.9610269734265,
+  "latency_ms": {
+    "mean": 7.1080036795,
+    "p50": 6.1048895,
+    "p95": 9.572629099999999,
+    "p99": 14.34283481000001,
+    "max": 195.022735
+  },
+  "threshold": 0.0011210612719878554,
+  "configured_percentile": 99.0,
+  "expected_keep_rate": 0.01,
+  "score_mean": 0.016290555818073267,
+  "score_median": 3.420740358706098e-05,
+  "score_p99": 0.0011114393698517236
+}

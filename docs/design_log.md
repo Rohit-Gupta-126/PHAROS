@@ -58,3 +58,94 @@ Installed `make` and `pytest` into the `pharos` env (`make setup` handles pytest
   faults). Overall (all-faults) AUC per system: RFQ 0.80/0.82, DTL 0.76/0.77,
   CCL 0.58/0.75, SCL 0.68/0.76 (AE/Iso). Both are reported so later phases can
   pick per fault type.
+
+## Phase 0.5 — reporting fixes (no retraining)
+
+Eval/plotting only; both existing checkpoints (`models/physics_vae`,
+`models/pdm/*`) reused unchanged.
+
+**Stream A — dual score reporting.** `eval_physics` now scores background vs
+`A→4ℓ` with two scores from the *same* VAE checkpoint:
+- `auc_latent_summu2` = **0.766** — the FPGA-cheap AXOL1TL-style trigger score
+  (Σμ², encoder only).
+- `auc_recon_mse` = **0.889** — full-VAE reconstruction MSE (decode from μ), the
+  offline accuracy reference.
+The **0.12 gap** quantifies what the cheap trigger score gives up versus running
+the decoder: A→4ℓ events reconstruct far worse (recon mean bg 0.84 vs signal
+264) than their latent means suggest, so recon-MSE is the better *offline*
+discriminator while Σμ² remains the deployable trigger. Both recorded in
+`physics_metrics.json` (with a `score_note`); `auc` kept as an alias of the
+trigger score for backward compat.
+`physics_score_hist.png` rebuilt as a two-panel **log10 x-axis** figure (bins on
+`log10(score+eps)`, clipped to the 0.5–99.5 percentile range) so the
+right-skewed distributions actually show the background peak vs the signal tail.
+
+**Stream B — label hygiene + honest aggregates.** Fault-class labels are now
+canonicalized (collapse internal whitespace + title-case) before aggregation, so
+case/spacing variants such as `C FLUX Low Fault` / `C Flux Low Fault` merge into
+one class. This drops the per-system fault-class **row** count in `pdm_auc.csv`
+from 68 to **67** (one within-system `FLUX`/`Flux` duplicate merged); those 67
+rows span **42 distinct** fault classes (the same class in two systems is two
+rows). Note `B Flux Low` and `C Flux Low` are genuinely different classes and
+stay separate. `pdm_auc.csv` gains an `n_below_floor` column flagging classes
+with n<5 (17 such rows); every class is still listed, but the headline
+**median AUC** stat is computed only over the **50** rows with n≥5: median **AE 0.711**, **IsolationForest 0.805** — the
+IsoForest baseline still leads. Per-system ALL-faults AUCs are unchanged
+(RFQ 0.80/0.82, DTL 0.76/0.77, CCL 0.58/0.75, SCL 0.68/0.76 AE/Iso).
+`pdm_metrics.json` restructured to `{headline, per_system}`.
+
+## Phase 1 — streaming backbone
+
+**Broker.** Single-node Redpanda v24.2 (Kafka API on `localhost:9092`) +
+Redpanda Console (`:8080`) under a `broker` compose profile — the only
+containers. Capped for the 12 GB WSL guest: `--smp 1 --memory 1500M
+--reserve-memory 0M --overprovisioned`. A one-shot `rpk` container creates the
+four single-partition topics (`events.physics`, `events.pdm`,
+`anomalies.scouting`, `alerts.pdm`).
+
+**Process placement.** Producers and scorers run as host Python processes in
+the WSL `pharos` env, NOT in containers — saves RAM and gives the scorers
+direct CUDA access. Plain `confluent-kafka` clients; no Flink/Spark/Faust.
+
+**Wire format** (`docs/wire_format.md`). Versioned JSON, keyed by `event_id`,
+with a producer nanosecond timestamp. Producers emit *pre-normalization*,
+model-ready-shape data (physics: raw 57-dim vectors; PDM: avg-pooled
+`(500,14)` waves via the Phase 0 `src.preprocessing` code) so the scorer owns
+normalization — one source of truth, streaming scores match Phase 0 exactly
+(asserted by `tests/test_phase1.py` JSON round-trip tests). PDM records carry
+`ground_truth` for offline keep-rate accounting only.
+
+**Thresholds are derived** (`scripts/derive_thresholds.py` → `make
+thresholds`): the p99 (configurable) of the Phase 0 background/normal score
+distribution, scored with the frozen artifacts — physics on the held-out file
+tail (0.9–1.0), PDM on the normal-validation pulses per system (Phase 0 seed,
+so the AE never saw them). Stored in `configs/thresholds.json`; expected
+background keep-rate is `(100−p)/100` by construction. Derived: physics
+p99(Σμ²)=1.12e-3; PDM p99(recon MSE) RFQ 0.164 / DTL 0.152 / CCL 0.227 /
+SCL 0.161.
+
+**Scorers** load Phase 0 checkpoints + normalizers frozen (no refit). The
+physics scorer micro-batches (default 256) to amortize GPU calls; PDM scores
+per pulse. Keepers republished as compact `{event_id, score, threshold, ts}`
+records. On idle-exit each scorer writes latency (producer→scored),
+throughput, and keep-rate metrics + plots to `reports/phase1/`.
+
+**Phase 0 consistency check.** Replaying 10k held-out background events
+through the wire gave a scorer-side median Σμ² of 3.42e-05 vs the Phase 0
+eval median 3.43e-05, and a background keep-rate of **0.99%** against the 1%
+configured — the streaming path reproduces the offline distribution.
+`tests/test_phase1.py` additionally asserts producer-JSON→scorer scores match
+direct scoring to rtol 1e-5.
+
+**End-to-end results** (concurrent scorers + producers, `make phase1` /
+`scripts/phase1_demo.sh`, reports in `reports/phase1/`):
+- Physics: 10k events at 500 ev/s; keep-rate 0.99% (99/10000);
+  producer→scored latency p50 6.1 ms / p95 9.6 ms / max 195 ms (first-batch
+  warm-up); throughput matches the configured rate. Unthrottled scoring
+  capacity measured earlier at ~40k events/s (GPU micro-batch 256).
+- PDM: 600 pulses (150 × 4 systems) at 20 /s; keep-rate 1.67% (10/600) —
+  slightly above the 1% target because the demo replays the *head* of each
+  file rather than the normal-validation split the threshold was derived on;
+  latency p50 20 ms / p95 26 ms.
+- Container budget: Redpanda ~300 MiB + Console ~23 MiB — the only
+  containers, well inside the 12 GB WSL guest.

@@ -1,0 +1,25 @@
+{
+  "stream": "pdm",
+  "n_messages": 600,
+  "n_kept": 10,
+  "keep_rate": 0.016666666666666666,
+  "throughput_msgs_per_sec": 12.802974323792721,
+  "latency_ms": {
+    "mean": 20.886631736666665,
+    "p50": 20.231939,
+    "p95": 25.55894315,
+    "p99": 29.72967966,
+    "max": 196.686668
+  },
+  "thresholds": {
+    "RFQ": 0.16369366645812988,
+    "DTL": 0.15205009281635284,
+    "CCL": 0.22748324275016785,
+    "SCL": 0.16056697070598602
+  },
+  "configured_percentile": 99.0,
+  "expected_background_keep_rate": 0.01,
+  "normal_pulses_seen": 600,
+  "normal_keep_rate": 0.016666666666666666,
+  "score_median": 0.03554551303386688
+}

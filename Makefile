@@ -85,12 +85,8 @@ score-pdm:
 # producers replay a bounded sample, scorers exit on idle and write
 # reports/phase1/ metrics.
 phase1: up
-	$(PYTHON) -m services.scorers.physics_scorer & \
-	$(PYTHON) -m services.scorers.pdm_scorer & \
-	sleep 3; \
-	$(PYTHON) -m services.producers.physics_producer --rate $(PHYS_RATE) --limit $(PHYS_LIMIT); \
-	$(PYTHON) -m services.producers.pdm_producer --rate $(PDM_RATE) --limit $(PDM_LIMIT); \
-	wait
+	PHYS_RATE=$(PHYS_RATE) PHYS_LIMIT=$(PHYS_LIMIT) PDM_RATE=$(PDM_RATE) PDM_LIMIT=$(PDM_LIMIT) \
+		bash scripts/phase1_demo.sh
 
 clean:
 	rm -rf models/physics_vae models/pdm
