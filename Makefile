@@ -1,4 +1,4 @@
-# PHAROS Phase 0 targets.
+# PHAROS Phase 0 + Phase 1 targets.
 # Run inside the WSL `pharos` conda env:
 #   conda activate pharos && make train-physics
 # Override the interpreter with:  make PYTHON=/path/to/python train-physics
@@ -9,7 +9,14 @@ export PYTHONPATH := $(CURDIR)
 PHYSICS_CFG ?= configs/physics_vae.yaml
 PDM_CFG ?= configs/pdm_ae.yaml
 
-.PHONY: help setup train-physics eval-physics train-pdm eval-pdm phase0 smoke clean
+# Phase 1 demo knobs (override on the command line).
+PHYS_RATE ?= 500
+PHYS_LIMIT ?= 10000
+PDM_RATE ?= 20
+PDM_LIMIT ?= 150
+
+.PHONY: help setup train-physics eval-physics train-pdm eval-pdm phase0 smoke clean \
+        up down thresholds produce-physics produce-pdm score-physics score-pdm phase1
 
 help:
 	@echo "PHAROS Phase 0 targets:"
@@ -20,6 +27,15 @@ help:
 	@echo "  make eval-pdm       per-fault-class AUC table + plots -> reports/phase0/"
 	@echo "  make phase0         train + eval both streams"
 	@echo "  make smoke          run the tiny-subset smoke tests (CPU)"
+	@echo "PHAROS Phase 1 targets (broker in Docker; producers/scorers on host):"
+	@echo "  make up             start Redpanda + Console (broker profile) + topics"
+	@echo "  make down           stop the broker containers"
+	@echo "  make thresholds     derive scorer thresholds from Phase 0 backgrounds"
+	@echo "  make produce-physics  replay ADC2021 background -> events.physics"
+	@echo "  make produce-pdm      replay HVCM pulses -> events.pdm"
+	@echo "  make score-physics    score events.physics -> anomalies.scouting"
+	@echo "  make score-pdm        score events.pdm -> alerts.pdm"
+	@echo "  make phase1           broker up + short end-to-end demo of both streams"
 
 setup:
 	$(PYTHON) -m pip install pytest pyyaml joblib
@@ -40,6 +56,41 @@ phase0: train-physics eval-physics train-pdm eval-pdm
 
 smoke:
 	$(PYTHON) -m pytest tests/ -q
+
+# ---------------------------------------------------------------- Phase 1 ----
+
+up:
+	docker compose --profile broker up -d
+	docker compose --profile broker ps
+
+down:
+	docker compose --profile broker down
+
+thresholds:
+	$(PYTHON) -m scripts.derive_thresholds
+
+produce-physics:
+	$(PYTHON) -m services.producers.physics_producer --rate $(PHYS_RATE) --limit $(PHYS_LIMIT)
+
+produce-pdm:
+	$(PYTHON) -m services.producers.pdm_producer --rate $(PDM_RATE) --limit $(PDM_LIMIT)
+
+score-physics:
+	$(PYTHON) -m services.scorers.physics_scorer
+
+score-pdm:
+	$(PYTHON) -m services.scorers.pdm_scorer
+
+# Short end-to-end demo: broker up, scorers listening in the background,
+# producers replay a bounded sample, scorers exit on idle and write
+# reports/phase1/ metrics.
+phase1: up
+	$(PYTHON) -m services.scorers.physics_scorer & \
+	$(PYTHON) -m services.scorers.pdm_scorer & \
+	sleep 3; \
+	$(PYTHON) -m services.producers.physics_producer --rate $(PHYS_RATE) --limit $(PHYS_LIMIT); \
+	$(PYTHON) -m services.producers.pdm_producer --rate $(PDM_RATE) --limit $(PDM_LIMIT); \
+	wait
 
 clean:
 	rm -rf models/physics_vae models/pdm
