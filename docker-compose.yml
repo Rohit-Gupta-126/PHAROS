@@ -1,0 +1,71 @@
+# PHAROS streaming backbone (Phase 1).
+#
+# Only the broker runs in containers (profile `broker`, the default target of
+# `make up`). Producers and scorers are host Python processes in the `pharos`
+# env connecting to localhost:9092 -- do NOT containerize them (RAM budget).
+#
+# Redpanda is capped for a 12 GB WSL guest: 1 core, 1.5 GB, no reservation.
+
+name: pharos
+
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.2.18
+    profiles: ["broker"]
+    command:
+      - redpanda
+      - start
+      - --smp=1
+      - --memory=1500M
+      - --reserve-memory=0M
+      - --overprovisioned
+      - --node-id=0
+      - --kafka-addr=internal://0.0.0.0:29092,external://0.0.0.0:9092
+      # Host processes reach the broker at localhost:9092; containers (Console,
+      # topic-init) use the internal listener.
+      - --advertise-kafka-addr=internal://redpanda:29092,external://localhost:9092
+      - --rpc-addr=0.0.0.0:33145
+      - --advertise-rpc-addr=redpanda:33145
+      - --mode=dev-container
+    ports:
+      - "9092:9092"    # Kafka API (external listener)
+      - "9644:9644"    # Admin API / metrics
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health --exit-when-healthy || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
+
+  # One-shot: create the four PHAROS topics (single partition each), then exit.
+  topic-init:
+    image: redpandadata/redpanda:v24.2.18
+    profiles: ["broker"]
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        rpk topic create
+        events.physics events.pdm anomalies.scouting alerts.pdm
+        --partitions 1 --replicas 1
+        --brokers redpanda:29092
+        || true
+    restart: "no"
+
+  console:
+    image: redpandadata/console:v2.7.2
+    profiles: ["broker"]
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKERS: redpanda:29092
+    ports:
+      - "8080:8080"
+
+volumes:
+  redpanda-data:
