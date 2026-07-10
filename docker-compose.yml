@@ -39,7 +39,7 @@ services:
       retries: 20
       start_period: 10s
 
-  # One-shot: create the four PHAROS topics (single partition each), then exit.
+  # One-shot: create the PHAROS topics (single partition each), then exit.
   topic-init:
     image: redpandadata/redpanda:v24.2.18
     profiles: ["broker"]
@@ -51,6 +51,7 @@ services:
       - >
         rpk topic create
         events.physics events.pdm anomalies.scouting alerts.pdm
+        events.physics.scored
         --partitions 1 --replicas 1
         --brokers redpanda:29092
         || true

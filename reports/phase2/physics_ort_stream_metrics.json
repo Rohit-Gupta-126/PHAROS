@@ -1,0 +1,18 @@
+{
+  "stream": "physics_ort",
+  "n_messages": 10000,
+  "n_kept": 99,
+  "keep_rate": 0.0099,
+  "throughput_msgs_per_sec": 501.13070022933255,
+  "latency_ms": {
+    "mean": 5.468780187299999,
+    "p50": 5.4860745,
+    "p95": 7.811837049999999,
+    "p99": 8.406451750000002,
+    "max": 61.40732
+  },
+  "backend": "ort",
+  "threshold": 0.0011210612719878554,
+  "output_topic": "events.physics.scored",
+  "forward_all": true
+}

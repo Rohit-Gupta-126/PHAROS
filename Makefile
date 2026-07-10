@@ -16,7 +16,8 @@ PDM_RATE ?= 20
 PDM_LIMIT ?= 150
 
 .PHONY: help setup train-physics eval-physics train-pdm eval-pdm phase0 smoke clean \
-        up down thresholds produce-physics produce-pdm score-physics score-pdm phase1
+        up down thresholds produce-physics produce-pdm score-physics score-pdm phase1 \
+        export-onnx verify-onnx sofie-probe bench-inference score-physics-p2 decision phase2
 
 help:
 	@echo "PHAROS Phase 0 targets:"
@@ -36,6 +37,14 @@ help:
 	@echo "  make score-physics    score events.physics -> anomalies.scouting"
 	@echo "  make score-pdm        score events.pdm -> alerts.pdm"
 	@echo "  make phase1           broker up + short end-to-end demo of both streams"
+	@echo "PHAROS Phase 2 targets (trigger-realistic inference + decision layer):"
+	@echo "  make export-onnx      export VAE encoder->mu to ONNX (batch 1)"
+	@echo "  make verify-onnx      PyTorch vs onnxruntime parity -> reports/phase2/"
+	@echo "  make sofie-probe      one-shot rootproject/root container SOFIE check"
+	@echo "  make bench-inference  per-event latency: pytorch vs ort (vs sofie)"
+	@echo "  make score-physics-p2 ORT scorer, forward-all -> events.physics.scored"
+	@echo "  make decision         L1-budget decision layer -> anomalies.scouting"
+	@echo "  make phase2           broker up + scorer + decision end-to-end demo"
 
 setup:
 	$(PYTHON) -m pip install pytest pyyaml joblib
@@ -87,6 +96,32 @@ score-pdm:
 phase1: up
 	PHYS_RATE=$(PHYS_RATE) PHYS_LIMIT=$(PHYS_LIMIT) PDM_RATE=$(PDM_RATE) PDM_LIMIT=$(PDM_LIMIT) \
 		bash scripts/phase1_demo.sh
+
+# ---------------------------------------------------------------- Phase 2 ----
+
+export-onnx:
+	$(PYTHON) -m scripts.export_onnx
+
+verify-onnx:
+	$(PYTHON) -m scripts.verify_onnx
+
+# One-shot ROOT container; writes reports/phase2/sofie_probe.txt. A non-zero
+# exit just means "SOFIE not available", which is a valid documented outcome.
+sofie-probe:
+	docker run --rm -v "$(CURDIR):/work" -w /work rootproject/root:latest \
+		python3 scripts/sofie_probe.py || true
+
+bench-inference:
+	$(PYTHON) -m scripts.bench_inference
+
+score-physics-p2:
+	$(PYTHON) -m services.scorers.physics_scorer_sofie --backend ort --forward-all
+
+decision:
+	$(PYTHON) -m services.decision.physics_decision
+
+phase2: up
+	PHYS_RATE=$(PHYS_RATE) PHYS_LIMIT=$(PHYS_LIMIT) bash scripts/phase2_demo.sh
 
 clean:
 	rm -rf models/physics_vae models/pdm
