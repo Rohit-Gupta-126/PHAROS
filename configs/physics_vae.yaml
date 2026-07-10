@@ -1,0 +1,27 @@
+# Stream A - physics VAE (ADC2021). See src/training/train_physics.py DEFAULTS.
+background_path: data/raw/adc2021/background_for_training.h5
+signal_path: data/raw/adc2021/Ato4l_lepFilter_13TeV_filtered.h5
+signal_name: "A->4l"
+out_dir: models/physics_vae
+model_dir: models/physics_vae
+reports_dir: reports/phase0
+
+# data
+max_events: 2000000      # background events subsampled for train/val
+val_frac: 0.1
+eval_events: 100000      # per-class events for evaluation
+
+# model
+latent_dim: 8
+hidden: [32, 16]
+
+# training
+epochs: 20
+batch_size: 1024
+lr: 0.001
+beta: 1.0
+kl_warmup_epochs: 5
+amp: true
+seed: 1337
+device: null             # null -> auto (cuda if available)
+export_onnx: false

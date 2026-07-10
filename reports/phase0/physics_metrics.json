@@ -1,0 +1,10 @@
+{
+  "auc": 0.7664866677089104,
+  "signal": "A->4l",
+  "n_background": 100000,
+  "n_signal": 55969,
+  "background_score_mean": 0.020886335521936417,
+  "signal_score_mean": 0.08273942023515701,
+  "background_score_median": 3.433319216128439e-05,
+  "signal_score_median": 0.00014925656432751566
+}

@@ -1,0 +1,26 @@
+# Stream B - PDM conv AE + IsolationForest (HVCM). See src/training/train_pdm.py.
+data_dir: data/raw/hvcm
+out_dir: models/pdm
+model_dir: models/pdm
+reports_dir: reports/phase0
+
+systems: [RFQ, DTL, CCL, SCL]
+target_len: 500          # waveforms downsampled 4500 -> 500 by avg pooling
+max_pulses: null
+val_frac: 0.15
+min_fault_samples: 3     # eval: skip fault classes with fewer samples
+
+# conv AE
+base: 16
+latent_channels: 8
+epochs: 30
+batch_size: 32
+lr: 0.001
+amp: true
+
+# IsolationForest baseline
+iso_estimators: 200
+iso_contamination: auto
+
+seed: 1337
+device: null             # null -> auto (cuda if available)
