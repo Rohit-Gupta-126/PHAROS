@@ -17,7 +17,8 @@ PDM_LIMIT ?= 150
 
 .PHONY: help setup train-physics eval-physics train-pdm eval-pdm phase0 smoke clean \
         up down thresholds produce-physics produce-pdm score-physics score-pdm phase1 \
-        export-onnx verify-onnx sofie-probe bench-inference score-physics-p2 decision phase2
+        export-onnx verify-onnx sofie-probe bench-inference score-physics-p2 decision phase2 \
+        hls4ml-estimate
 
 help:
 	@echo "PHAROS Phase 0 targets:"
@@ -45,6 +46,7 @@ help:
 	@echo "  make score-physics-p2 ORT scorer, forward-all -> events.physics.scored"
 	@echo "  make decision         L1-budget decision layer -> anomalies.scouting"
 	@echo "  make phase2           broker up + scorer + decision end-to-end demo"
+	@echo "  make hls4ml-estimate  hls4ml conversion + C-emulation check (no Vivado)"
 
 setup:
 	$(PYTHON) -m pip install pytest pyyaml joblib
@@ -119,6 +121,11 @@ score-physics-p2:
 
 decision:
 	$(PYTHON) -m services.decision.physics_decision
+
+# hls4ml conversion + C-emulation estimate (NO Vivado/Vitis; see
+# docs/hls4ml_synthesis.md for the one-time full synthesis elsewhere).
+hls4ml-estimate:
+	$(PYTHON) -m scripts.hls4ml_estimate
 
 phase2: up
 	PHYS_RATE=$(PHYS_RATE) PHYS_LIMIT=$(PHYS_LIMIT) bash scripts/phase2_demo.sh

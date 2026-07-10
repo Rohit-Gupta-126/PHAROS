@@ -149,3 +149,54 @@ direct scoring to rtol 1e-5.
   latency p50 20 ms / p95 26 ms.
 - Container budget: Redpanda ~300 MiB + Console ~23 MiB — the only
   containers, well inside the 12 GB WSL guest.
+
+## Phase 2 — trigger-realistic inference + decision layer
+
+**Encoder-only ONNX export.** The trigger score Σμ² needs only the encoder
+trunk + μ head, so `scripts/export_onnx.py` exports a 57→μ[8] wrapper (fixed
+batch 1, opset 13, legacy exporter → plain Gemm/Relu graph) from the frozen
+Phase 0 checkpoint. Parity vs PyTorch on 2k held-out background events:
+max |Δμ| = 8.9e-8, max |ΔΣμ²| = 7.5e-9 (`reports/phase2/onnx_parity.txt`).
+
+**SOFIE probe → deferred, ORT is the runnable path.** `rootproject/root:latest`
+(ROOT 6.38.00) ships the SOFIE runtime (`libROOTTMVASofie.so`) but NOT the
+ONNX parser — `RModelParser_ONNX` is absent and `root-config --features`
+lacks `tmva-sofie` (`reports/phase2/sofie_probe.txt`). Building ROOT with
+`-Dtmva-sofie=ON` is a multi-hour >8 GB build — too heavy for this laptop by
+the project's own stop rule. Decision: `docker/root-sofie.Dockerfile` records
+the build recipe for a bigger machine; `services/inference_sofie/` holds a
+ready-to-compile BLAS-only C++ `main.cpp` (line protocol: 57 floats in, Σμ²
+out) against SOFIE's generated-header interface; **ONNX Runtime is the
+documented runnable deploy path**.
+
+**Deploy-path scorer + latency.** `services/scorers/trigger_backends.py`
+gives interchangeable batch-1 backends (pytorch / ort / sofie-subprocess);
+`services/scorers/physics_scorer_sofie.py` streams `events.physics` through
+them. Offline benchmark (`make bench-inference`, 5k events, batch 1, CPU,
+1 intra-op thread): **ORT 7.4 µs/event mean (p99 15.6 µs) vs PyTorch 32 µs
+mean (p99 91 µs)** — ~4.3× faster, parity 1.9e-6 ≤ 1e-5
+(`reports/phase2/inference_latency.{json,png}`).
+
+**Decision / rate-control layer.** `services/decision/physics_decision.py`
+consumes fully-scored events from a new topic `events.physics.scored`
+(scorer run with `--forward-all`), applies the Phase 1 p99 threshold AND a
+hard L1-style accept budget: per 1 s window, keep the top-N passers where
+N = ceil(1% × window input). Kept events go to `anomalies.scouting` with
+`decision_reason` = `threshold_pass` (budget not binding) or `rate_limited`
+(window had more passers than budget; the rest dropped). End-to-end
+(`make phase2`, 10k events at 500 ev/s): scorer keep-rate 0.99%, e2e latency
+p50 5.5 ms; decision kept 87/10000 (12 rate-dropped in bursty windows) →
+**reduction factor 115×** at the 1% budget
+(`reports/phase2/decision_stats.json`).
+
+**hls4ml (report-only).** hls4ml 1.3.0 installed cleanly (PyTorch frontend,
+Vitis backend, io_parallel); C-emulation compiled with conda `cxx-compiler`
+(no Vivado anywhere). Key finding: the tutorial default `ap_fixed<16,6>` is
+unusable for this trigger — μ sits near a ~1e-3 threshold and 10 fractional
+bits gave only 91% p99 decision agreement; **`ap_fixed<24,8>` restores 100%
+agreement** (max |Δμ| ≈ 6e-4). Static estimate: 2 520 params / 2 464 MACs →
+~2.5k DSPs at ReuseFactor 1 (RF 4–8 or 8-bit weights is the realistic
+deployment point), pipeline latency O(100 ns) at 200 MHz. QKeras QAT skipped
+(unmaintained on Keras-3-era stacks); post-training fixed-point suffices at
+`<24,8>`. Full Vitis HLS synthesis is a documented one-time recipe for a lab
+machine: `docs/hls4ml_synthesis.md`.

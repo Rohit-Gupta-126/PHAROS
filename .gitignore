@@ -15,3 +15,4 @@ venv/
 *.pt
 .ipynb_checkpoints/
 PHAROS_BUILD_PLAN.md
+models/physics_vae/hls4ml_prj/

@@ -1,0 +1,28 @@
+{
+  "generated": "2026-07-10T21:35:48.741246+00:00",
+  "tool": "hls4ml 1.3.0, backend Vitis, io_parallel",
+  "precision": "ap_fixed<24,8>",
+  "reuse_factor": 1,
+  "quantization": "post-training fixed-point (QKeras QAT deferred; deprecated on Keras 3 stacks)",
+  "network": {
+    "layers": [
+      57,
+      32,
+      16,
+      8
+    ],
+    "parameters": 2520,
+    "macs_per_event": 2464
+  },
+  "static_estimate": {
+    "dsp_multipliers_at_reuse_1": 2464,
+    "note": "at ReuseFactor=1 each MAC maps to ~1 DSP48; RF=R divides DSPs by R and multiplies II by R. ~2.4k DSPs exceeds a mid-range part, so RF 4-8 or 8-bit weights are the realistic deployment point.",
+    "pipeline_latency_cycles_order": "O(layers) ~ 10-30 cycles at II=1, i.e. ~50-150 ns at 200 MHz"
+  },
+  "c_emulation_check": {
+    "n_events": 2000,
+    "max_abs_mu_diff_vs_float": 0.000608980655670166,
+    "trigger_decision_agreement_at_p99": 1.0
+  },
+  "full_synthesis": "requires Vitis HLS -- see docs/hls4ml_synthesis.md"
+}
