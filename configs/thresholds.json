@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-07-10T15:48:57.423626+00:00",
+  "percentile": 99.0,
+  "expected_background_keep_rate": 0.01,
+  "physics": {
+    "score": "sum_mu2",
+    "threshold": 0.0011210612719878554,
+    "percentile": 99.0,
+    "n_background": 100000,
+    "background_region": [
+      0.9,
+      1.0
+    ],
+    "score_mean": 0.020886335521936417,
+    "score_median": 3.433319216128439e-05
+  },
+  "pdm": {
+    "RFQ": {
+      "score": "ae_recon_mse",
+      "threshold": 0.16369366645812988,
+      "percentile": 99.0,
+      "n_normal_val": 104,
+      "score_mean": 0.031536493450403214,
+      "score_median": 0.02644038200378418
+    },
+    "DTL": {
+      "score": "ae_recon_mse",
+      "threshold": 0.15205009281635284,
+      "percentile": 99.0,
+      "n_normal_val": 138,
+      "score_mean": 0.05267646908760071,
+      "score_median": 0.04298925772309303
+    },
+    "CCL": {
+      "score": "ae_recon_mse",
+      "threshold": 0.22748324275016785,
+      "percentile": 99.0,
+      "n_normal_val": 263,
+      "score_mean": 0.06370848417282104,
+      "score_median": 0.04858345910906792
+    },
+    "SCL": {
+      "score": "ae_recon_mse",
+      "threshold": 0.16056697070598602,
+      "percentile": 99.0,
+      "n_normal_val": 584,
+      "score_mean": 0.025505324825644493,
+      "score_median": 0.022576097398996353
+    }
+  }
+}
