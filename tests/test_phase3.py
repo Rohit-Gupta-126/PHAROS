@@ -86,6 +86,48 @@ class TestSlidingWindow:
         assert ev["window_end_ns"] == 499
 
 
+class TestMonitorPlumbing:
+    def test_reference_files_roundtrip(self, tmp_path):
+        import json
+        from services.monitor.reference import PhysicsReferences
+        entry = ReferenceDist.from_samples("score", RNG.normal(0, 1, 1000))
+        d = {**entry.to_dict(), "samples": [0.1, 0.2, 0.3]}
+        path = tmp_path / "reference_stats.json"
+        path.write_text(json.dumps({
+            "schema": "pharos.reference_stats.v1", "stream": "physics",
+            "score": d, "features": {"f00": d}}))
+        refs = PhysicsReferences.load(path)
+        assert refs.score.samples.tolist() == [0.1, 0.2, 0.3]
+        assert "f00" in refs.features
+
+    def test_tracker_emits_alert_on_shift(self):
+        from services.monitor.reference import Reference
+        from services.monitor.drift_monitor import Tracker
+        base = RNG.normal(0, 1, 3000)
+        ref = Reference(dist=ReferenceDist.from_samples("score", base),
+                        samples=base[:500])
+        t = Tracker("physics", ref, window=200, step=200, warn=0.1,
+                    alert=0.25, with_ks=True)
+        events = [e for i, v in enumerate(RNG.normal(3, 1, 200))
+                  if (e := t.add(v, ts_ns=i))]
+        assert len(events) == 1
+        ev = events[0]
+        assert ev["severity"] == "alert"
+        assert ev["schema"] == "pharos.drift.v1"
+        assert ev["stream"] == "physics"
+        assert ev["ks"]["pvalue"] < 1e-6
+
+    def test_tracker_silent_until_window_full(self):
+        from services.monitor.reference import Reference
+        from services.monitor.drift_monitor import Tracker
+        base = RNG.normal(0, 1, 3000)
+        ref = Reference(dist=ReferenceDist.from_samples("score", base),
+                        samples=base[:500])
+        t = Tracker("physics", ref, window=200, step=200, warn=0.1, alert=0.25)
+        assert all(t.add(v, ts_ns=i) is None
+                   for i, v in enumerate(RNG.normal(0, 1, 199)))
+
+
 class TestRollingMoments:
     def test_summary(self):
         m = RollingMoments(4)

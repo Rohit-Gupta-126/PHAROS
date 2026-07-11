@@ -52,6 +52,7 @@ services:
         rpk topic create
         events.physics events.pdm anomalies.scouting alerts.pdm
         events.physics.scored
+        events.pdm.scored alerts.drift ctrl.inject
         --partitions 1 --replicas 1
         --brokers redpanda:29092
         || true

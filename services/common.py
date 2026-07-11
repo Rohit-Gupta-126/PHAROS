@@ -19,11 +19,17 @@ TOPIC_PHYSICS = "events.physics"
 TOPIC_PDM = "events.pdm"
 TOPIC_SCOUTING = "anomalies.scouting"
 TOPIC_ALERTS = "alerts.pdm"
+TOPIC_PDM_SCORED = "events.pdm.scored"   # Phase 3: forward-all PDM scores
+TOPIC_DRIFT = "alerts.drift"             # Phase 3: monitor drift events
+TOPIC_INJECT = "ctrl.inject"             # Phase 3: injection markers
 
 SCHEMA_PHYSICS = "pharos.physics.v1"
 SCHEMA_PDM = "pharos.pdm.v1"
 SCHEMA_SCOUTING = "pharos.scouting.v1"
 SCHEMA_ALERT = "pharos.pdm_alert.v1"
+SCHEMA_PDM_SCORED = "pharos.pdm_scored.v1"
+SCHEMA_DRIFT = "pharos.drift.v1"
+SCHEMA_INJECT = "pharos.inject_marker.v1"
 
 
 def now_ns() -> int:

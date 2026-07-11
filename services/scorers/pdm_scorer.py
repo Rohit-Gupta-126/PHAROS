@@ -40,6 +40,10 @@ def main(argv=None) -> None:
                         "starting at end-of-topic -- offset hygiene)")
     p.add_argument("--idle", type=float, default=15.0)
     p.add_argument("--device", type=str, default=None, choices=["cpu", "cuda"])
+    p.add_argument("--forward-all", action="store_true",
+                   help="ALSO publish every scored pulse (kept or not, with "
+                        "per-channel means for the drift monitor) to "
+                        "events.pdm.scored")
     args = p.parse_args(argv)
 
     device = get_device(args.device)
@@ -81,6 +85,21 @@ def main(argv=None) -> None:
             if r.get("ground_truth") == "Run":
                 normal_total += 1
                 normal_kept += int(kept)
+            if args.forward_all:
+                common.produce_json(producer, common.TOPIC_PDM_SCORED, {
+                    "schema": common.SCHEMA_PDM_SCORED,
+                    "event_id": r["event_id"],
+                    "system": system,
+                    "score": score,
+                    "threshold": thresholds[system],
+                    "kept": kept,
+                    # Per-channel means: cheap drift features so the monitor
+                    # never has to consume the full waveforms.
+                    "channel_means": np.round(
+                        wave[0].mean(axis=0), 8).tolist(),
+                    "producer_ts_ns": r["producer_ts_ns"],
+                    "scored_ts_ns": scored_ts,
+                }, key=r["event_id"])
             if kept:
                 common.produce_json(producer, common.TOPIC_ALERTS, {
                     "schema": common.SCHEMA_ALERT,
@@ -91,7 +110,7 @@ def main(argv=None) -> None:
                     "producer_ts_ns": r["producer_ts_ns"],
                     "scored_ts_ns": scored_ts,
                 }, key=r["event_id"])
-                producer.poll(0)
+            producer.poll(0)
     finally:
         producer.flush(30)
         consumer.close()
