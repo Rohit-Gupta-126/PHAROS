@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PHAROS — live trigger &amp; drift monitor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <div class="brand-text">
+        <h1>PHAROS</h1>
+        <p>Pipeline for High-throughput Anomaly Recognition in Online Streams</p>
+      </div>
+    </div>
+    <div class="conn" id="conn">
+      <span class="dot" id="conn-dot"></span>
+      <span id="conn-text">connecting…</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- KPI row -->
+    <section class="kpis" aria-label="live metrics">
+      <div class="tile" id="tile-phys-rate">
+        <span class="tile-label">physics throughput</span>
+        <span class="tile-value"><span data-k="phys-rate">—</span><span class="unit">ev/s</span></span>
+        <span class="tile-sub">10&nbsp;s window</span>
+      </div>
+      <div class="tile" id="tile-phys-keep">
+        <span class="tile-label">physics keep-rate</span>
+        <span class="tile-value"><span data-k="phys-keep">—</span></span>
+        <span class="tile-sub" data-k="phys-keep-sub">kept / dropped</span>
+      </div>
+      <div class="tile" id="tile-pdm-rate">
+        <span class="tile-label">PDM throughput</span>
+        <span class="tile-value"><span data-k="pdm-rate">—</span><span class="unit">ev/s</span></span>
+        <span class="tile-sub">10&nbsp;s window</span>
+      </div>
+      <div class="tile" id="tile-pdm-keep">
+        <span class="tile-label">PDM keep-rate</span>
+        <span class="tile-value"><span data-k="pdm-keep">—</span></span>
+        <span class="tile-sub" data-k="pdm-keep-sub">kept / dropped</span>
+      </div>
+      <div class="tile accent" id="tile-reduction">
+        <span class="tile-label">reduction factor</span>
+        <span class="tile-value"><span data-k="reduction">—</span><span class="unit">×</span></span>
+        <span class="tile-sub">physics 1/keep-rate</span>
+      </div>
+    </section>
+
+    <!-- Score histograms -->
+    <section class="panel span-2" aria-label="physics anomaly score">
+      <div class="panel-head">
+        <h2>Physics · anomaly score Σμ²</h2>
+        <div class="legend">
+          <span class="key"><i class="sw ref"></i>reference (sim)</span>
+          <span class="key"><i class="sw cur"></i>current</span>
+        </div>
+      </div>
+      <canvas id="hist-physics" height="220"></canvas>
+      <p class="axis-note">log₁₀ score · reference = frozen Phase&nbsp;0 background</p>
+    </section>
+
+    <section class="panel span-2" aria-label="pdm reconstruction score">
+      <div class="panel-head">
+        <h2>PDM · reconstruction MSE <span class="tag" data-k="pdm-system"></span></h2>
+        <div class="legend">
+          <span class="key"><i class="sw ref"></i>reference (normal)</span>
+          <span class="key"><i class="sw cur"></i>current</span>
+        </div>
+      </div>
+      <canvas id="hist-pdm" height="220"></canvas>
+      <p class="axis-note">log₁₀ recon MSE · reference = frozen normal-validation pulses</p>
+    </section>
+
+    <!-- Throughput sparklines -->
+    <section class="panel span-2" aria-label="throughput history">
+      <div class="panel-head"><h2>Throughput</h2>
+        <div class="legend">
+          <span class="key"><i class="sw phys"></i>physics</span>
+          <span class="key"><i class="sw pdm"></i>PDM</span>
+        </div>
+      </div>
+      <canvas id="spark" height="150"></canvas>
+    </section>
+
+    <!-- Kept vs dropped -->
+    <section class="panel span-2" aria-label="kept versus dropped">
+      <div class="panel-head"><h2>Kept vs dropped</h2></div>
+      <div class="bars" id="keepbars"></div>
+    </section>
+
+    <!-- Drift feed -->
+    <section class="panel span-4" aria-label="drift alerts">
+      <div class="panel-head">
+        <h2>Drift alerts <span class="tag" id="drift-count">0 evaluations</span></h2>
+      </div>
+      <ul class="feed" id="feed">
+        <li class="feed-empty">no warn/alert drift events yet</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="statusbar">
+    <span id="foot">consumed: physics 0 · pdm 0 · drift 0</span>
+    <span class="foot-right">SSE · consumers start at end-of-topic · refresh 1&nbsp;s</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

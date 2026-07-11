@@ -1,6 +1,15 @@
 # PHAROS design log
 
-Decisions are recorded newest-last, tagged by phase.
+Decisions are recorded newest-last, tagged by phase. Read as a narrative, the
+arc is: **build the two detectors offline (Phase 0)** → **put them on a streaming
+backbone with one honest wire format (Phase 1)** → **make inference
+trigger-realistic and add an L1 budget (Phase 2)** → **watch for drift and close
+a parity-gated retrain loop (Phase 3)** → **feed the pipeline real detector data
+and give it a face (Phase 4)**. A recurring theme runs through all of it: when a
+result is inconvenient — the cheap trigger score is weaker than reconstruction,
+fixed-point precision flips trigger decisions, the drift "benign-skew" signature
+fails to separate, real data doesn't match the sim — the log records the finding
+rather than tuning a clean-looking demo.
 
 ## Phase 0 — offline ML cores
 
@@ -274,3 +283,68 @@ RFQ PDM skew @20 p/s).**
   `reports/phase3/pdm_skew_analysis.json` rather than tuned away. What it
   does establish: the Phase 1 keep-rate mismatch traces to real sampling
   bias in the replay slice, not to a drifting model.
+
+## Phase 4 — real-data ingestion + custom dashboard + final polish
+
+**The real ROOT entry point.** Phases 0–3 ran entirely on simulation (ADC2021
+Delphes physics, HVCM waveforms). Phase 4 makes ROOT *run on the real path*:
+`services/ingest_root/ingest_nanoaod.py` reads a **CMS Open Data NanoAOD**
+`Events` tree with PyROOT + RDataFrame (`EnableImplicitMT`, `Range` cap so the
+12 GB WSL guest never OOMs), maps the physics objects onto the **same 57-feature
+ADC2021 vector** the VAE was trained on, and writes a compact `(N,57)` `.npy`.
+The object→slot map (MET slot 0 with eta≡0; leading 4 e / 4 μ / 10 jets;
+zero-pad; PuppiMET with MET fallback) is documented in `docs/ingest_root.md`.
+
+**Container/host split.** RDataFrame extraction runs *inside* the
+`rootproject/root` one-shot container, but the Kafka client stays on the host:
+`stream_cms.py` replays the `.npy` through the **exact** Phase 1 producer
+interface (`pharos.physics.v1`, raw pre-normalization vectors). This honors the
+"producers are host processes" rule and avoids fattening the ROOT image with
+confluent-kafka — and, crucially, means real and simulated events travel the
+identical wire format, so a real event flows through the frozen sim-trained
+scorer unchanged.
+
+**Sim-to-real domain gap — reported, not tuned.** Real CMS data has a different
+object composition than the Delphes sim (trigger mix, pileup, multiplicities,
+spectra), so the *encoding* is identical but the feature *distributions* differ.
+`scripts/phase4_sim_vs_real.py` streams the real events through the unchanged ORT
+scorer + drift monitor and records the resulting PSI/KS per tracked feature and
+the anomaly score to `reports/phase4/sim_vs_real_drift.json`. The drift the
+monitor reports here is a **legitimate domain-gap finding**, not a bug — no
+artifact is retuned to close it. This is the same discipline as the Phase 3 PDM
+negative result, now applied across the sim/real boundary.
+
+**RDataFrame offline analysis.** `analysis/prep_adc_npy.py` (host: torch + h5py +
+sklearn) scores background vs A→4ℓ with the active model pointer, extracts a few
+physics observables straight from the 57-vector, and writes both the ROC/AUC
+table (`reports/phase4/physics_auc_table.{json,md}`) and a columnar `.npz`.
+`analysis/physics_rdf.py` (in-container) turns that `.npz` into overlaid
+background-vs-signal histograms via `RDF.FromNumpy` in a single multithreaded
+event loop. AUC stays host-side (needs torch/sklearn, absent from the ROOT
+image); RDataFrame does the histogramming that exploits implicit MT. **Medians**
+are quoted alongside means because the scores are heavy-tailed (recon-MSE means
+are outlier-dominated). Latent AUC reproduces ~0.775, recon ~0.889.
+
+**Custom dashboard — no Streamlit.** The Phase 3 Streamlit dashboard is replaced
+by a hand-built **static** frontend (`dashboard_web/`: `index.html` + `styles.css`
++ `app.js`, vanilla, no build step, no framework) fed by ONE small **read-only
+SSE bridge** (`services/dashboard_api/app.py`, stdlib `ThreadingHTTPServer`). The
+bridge reuses the Streamlit threading model (one confluent-kafka consumer per
+topic, fresh latest-offset groups, bounded deques) and only serves JSON — all
+rendering/logic lives in the static JS, which draws the score histograms and
+throughput sparklines by hand on `<canvas>` (no charting dependency). The panel
+shows live throughput + keep-rate per stream, reference-vs-current score
+histograms (overlaid, log-x), kept-vs-dropped counts, and the `alerts.drift`
+feed. Design is a dark technical instrument panel; the series palette (reference
+blue, current yellow, physics blue, PDM aqua, warn/alert status) was run through
+the dataviz palette validator against the dark surface (all checks pass — the
+dark-tuned yellow `#c98500` replaced a too-light first pick). Running containers
+remain Redpanda + Console only.
+
+**Final polish.** `docs/architecture.md` rewritten with the final Mermaid diagram
+(three ROOT slots: RDataFrame ingestion [now real], RDataFrame analysis [now
+real], SOFIE inference [deferred/documented]), a consolidated benchmark table,
+a one-command demo, and a reproducibility note. A `README.md` now leads with the
+project thesis and the three headline findings (Σμ²-vs-recon gap, hls4ml
+precision→trigger-decision finding, the drift-separability negative result). No
+retraining in Phase 4 — the active model pointer is reused.

@@ -20,7 +20,9 @@ PDM_LIMIT ?= 150
         export-onnx verify-onnx sofie-probe bench-inference score-physics-p2 decision phase2 \
         hls4ml-estimate \
         reference-stats monitor score-pdm-p3 inject-physics inject-pdm lead-time pdm-skew \
-        retrain-trigger dashboard phase3
+        retrain-trigger dashboard phase3 \
+        fetch-cms ingest-cms stream-cms sim-vs-real analysis-prep analysis-rdf \
+        dashboard-api phase4
 
 help:
 	@echo "PHAROS Phase 0 targets:"
@@ -60,6 +62,15 @@ help:
 	@echo "  make retrain-trigger  confirmed drift -> retrain -> parity -> hot-swap"
 	@echo "  make dashboard        Streamlit live dashboard (host, reads topics)"
 	@echo "  make phase3           broker up + full drift/inject/retrain demo"
+	@echo "PHAROS Phase 4 targets (real CMS ingestion + RDataFrame + web dashboard):"
+	@echo "  make fetch-cms        xrdcp a CMS Open Data NanoAOD file (one-shot ROOT)"
+	@echo "  make ingest-cms       RDataFrame NanoAOD -> data/interim/cms_events_57.npy"
+	@echo "  make stream-cms       replay CMS 57-vectors -> events.physics (host)"
+	@echo "  make sim-vs-real      stream CMS through scorer+monitor -> domain-gap report"
+	@echo "  make analysis-prep    host: AUC table + observables npz (active pointer)"
+	@echo "  make analysis-rdf     RDataFrame physics histograms -> reports/phase4/"
+	@echo "  make dashboard-api    read-only SSE bridge + static dashboard (no Streamlit)"
+	@echo "  make phase4           real-data ingest + domain-gap + analysis (needs Docker)"
 
 setup:
 	$(PYTHON) -m pip install pytest pyyaml joblib
@@ -174,6 +185,43 @@ dashboard:
 
 phase3: up
 	PHYS_RATE=$(PHYS_RATE) PDM_RATE=$(PDM_RATE) bash scripts/phase3_demo.sh
+
+# ---------------------------------------------------------------- Phase 4 ----
+# ROOT jobs run as one-shot rootproject/root containers (mirror sofie-probe);
+# the Kafka client stays on the host. Override the source with CMS_NANOAOD_URL.
+
+ROOT_IMAGE ?= rootproject/root:latest
+ROOT_RUN = docker run --rm -v "$(CURDIR):/work" -w /work $(ROOT_IMAGE)
+CMS_LIMIT ?= 50000
+DASH_PORT ?= 8070
+
+fetch-cms:
+	$(ROOT_RUN) bash services/ingest_root/fetch_nanoaod.sh
+
+# Ingest the first local NanoAOD file found in data/raw/cms_opendata/.
+ingest-cms:
+	$(ROOT_RUN) sh -c 'python3 services/ingest_root/ingest_nanoaod.py \
+		--source "$$(ls data/raw/cms_opendata/*.root | head -n1)" --limit $(CMS_LIMIT)'
+
+stream-cms:
+	$(PYTHON) -m services.ingest_root.stream_cms --rate $(PHYS_RATE) --limit $(PHYS_LIMIT)
+
+sim-vs-real:
+	$(PYTHON) -m scripts.phase4_sim_vs_real --rate $(PHYS_RATE) --limit $(PHYS_LIMIT)
+
+analysis-prep:
+	$(PYTHON) -m analysis.prep_adc_npy
+
+analysis-rdf:
+	$(ROOT_RUN) python3 analysis/physics_rdf.py --npz data/interim/adc_obs.npz
+
+dashboard-api:
+	$(PYTHON) -m services.dashboard_api.app --port $(DASH_PORT)
+
+# Real-data end-to-end: extract with RDataFrame, then measure the domain gap.
+# (fetch-cms first if data/raw/cms_opendata/ is empty.)
+phase4: up ingest-cms sim-vs-real
+	@echo "[phase4] domain-gap report -> reports/phase4/sim_vs_real_drift.json"
 
 clean:
 	rm -rf models/physics_vae models/pdm
