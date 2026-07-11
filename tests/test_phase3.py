@@ -128,6 +128,32 @@ class TestMonitorPlumbing:
                    for i, v in enumerate(RNG.normal(0, 1, 199)))
 
 
+class TestHotSwapPointer:
+    def test_write_then_read_roundtrip(self, tmp_path):
+        from services.monitor.hot_swap import ModelPointer
+        path = tmp_path / "current.json"
+        ModelPointer.write(path, "models/physics_vae_r1", 0.0012)
+        ptr = ModelPointer.read(path)
+        assert ptr.model_dir == "models/physics_vae_r1"
+        assert ptr.threshold == pytest.approx(0.0012)
+        assert ptr.swapped_at
+
+    def test_read_missing_or_corrupt_returns_none(self, tmp_path):
+        from services.monitor.hot_swap import ModelPointer
+        assert ModelPointer.read(tmp_path / "nope.json") is None
+        bad = tmp_path / "bad.json"
+        bad.write_text("{not json")
+        assert ModelPointer.read(bad) is None
+
+    def test_write_is_atomic_replace(self, tmp_path):
+        from services.monitor.hot_swap import ModelPointer
+        path = tmp_path / "current.json"
+        ModelPointer.write(path, "a", 1.0)
+        ModelPointer.write(path, "b", 2.0)
+        assert ModelPointer.read(path).model_dir == "b"
+        assert not path.with_suffix(".json.tmp").exists()
+
+
 class TestRollingMoments:
     def test_summary(self):
         m = RollingMoments(4)

@@ -51,6 +51,11 @@ def main(argv=None) -> None:
     p.add_argument("--output-topic", type=str, default=None,
                    help="default: events.physics.scored with --forward-all, "
                         "anomalies.scouting otherwise")
+    p.add_argument("--model-pointer", type=str, default=None,
+                   help="hot-swap pointer file (e.g. models/physics_vae/"
+                        "current.json); polled every --swap-poll messages, "
+                        "the scorer reloads when its model_dir changes")
+    p.add_argument("--swap-poll", type=int, default=500)
     args = p.parse_args(argv)
 
     model_dir = resolve_path(args.model_dir)
@@ -58,6 +63,21 @@ def main(argv=None) -> None:
     backend = make_backend(args.backend, model_dir)
     thr_cfg = json.loads(resolve_path(args.thresholds).read_text())
     threshold = thr_cfg["physics"]["threshold"]
+
+    pointer_path = resolve_path(args.model_pointer) if args.model_pointer else None
+    active_dir = str(model_dir)
+    n_swaps = 0
+    if pointer_path:
+        from services.monitor.hot_swap import ModelPointer
+        ptr = ModelPointer.read(pointer_path)
+        if ptr:  # pointer pre-exists: serve what it names
+            active_dir = ptr.model_dir
+            model_dir = resolve_path(ptr.model_dir)
+            normalizer = Normalizer.load(model_dir / "norm.npz")
+            backend = make_backend(args.backend, model_dir)
+            threshold = ptr.threshold
+        print(f"[physics-scorer-p2] hot-swap pointer: {pointer_path} "
+              f"(active={active_dir})")
     out_topic = args.output_topic or (
         TOPIC_SCORED if args.forward_all else common.TOPIC_SCOUTING)
     print(f"[physics-scorer-p2] backend={args.backend} "
@@ -71,8 +91,34 @@ def main(argv=None) -> None:
     producer = common.make_producer(args.bootstrap)
     stats = StreamStats(f"physics_{args.backend}")
 
+    n_since_poll = 0
     try:
         for r in common.consume_json(consumer, idle_timeout_s=args.idle):
+            if pointer_path:
+                n_since_poll += 1
+                if n_since_poll >= args.swap_poll:
+                    n_since_poll = 0
+                    ptr = ModelPointer.read(pointer_path)
+                    if ptr and ptr.model_dir != active_dir:
+                        # Load the NEW model fully before dropping the old
+                        # one -- a failed load keeps the old model serving.
+                        try:
+                            new_dir = resolve_path(ptr.model_dir)
+                            new_norm = Normalizer.load(new_dir / "norm.npz")
+                            new_backend = make_backend(args.backend, new_dir)
+                        except Exception as exc:  # noqa: BLE001
+                            print(f"[physics-scorer-p2] swap to "
+                                  f"{ptr.model_dir} FAILED to load ({exc}); "
+                                  f"keeping {active_dir}")
+                        else:
+                            if hasattr(backend, "close"):
+                                backend.close()
+                            normalizer, backend = new_norm, new_backend
+                            threshold = ptr.threshold
+                            active_dir = ptr.model_dir
+                            n_swaps += 1
+                            print(f"[physics-scorer-p2] HOT-SWAP -> "
+                                  f"{active_dir} threshold={threshold:.6g}")
             feats = np.asarray([r["features"]], dtype=np.float32)
             assert feats.shape[1] == N_FEATURES, feats.shape
             score = float(backend.score(normalizer.transform(feats))[0])
@@ -99,6 +145,8 @@ def main(argv=None) -> None:
             summary = stats.write_report(resolve_path(args.reports_dir), extra={
                 "backend": args.backend,
                 "threshold": threshold,
+                "active_model_dir": active_dir,
+                "n_hot_swaps": n_swaps,
                 "output_topic": out_topic,
                 "forward_all": args.forward_all,
             })
