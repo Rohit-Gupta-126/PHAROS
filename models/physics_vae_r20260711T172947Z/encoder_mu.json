@@ -1,0 +1,19 @@
+{
+  "source_ckpt": "/mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T172947Z/ckpt.pt",
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      57
+    ]
+  },
+  "output": {
+    "name": "mu",
+    "shape": [
+      1,
+      8
+    ]
+  },
+  "opset": 13,
+  "score": "sum_mu2 (sum of squared latent means)"
+}

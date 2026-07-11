@@ -1,0 +1,337 @@
+[phase3-demo] injecting pdm calibration skew...
+[inject-pdm] RFQ: baseline=104 normal-val pulses, then 120 file-head pulses at 20.0/s
+[inject-pdm] SWITCH ts=1783791222225930362 (marker -> /mnt/e/AI_Projects/PHAROS/reports/phase3/injection_marker_pdm.json)
+[inject-pdm] done
+[phase3-demo] injecting physics black-box shift...
+[inject-physics] baseline=4000 from data/raw/adc2021/background_for_training.h5 | injected=6000 from data/raw/adc2021/BlackBox_13TeV_PU20.h5 at 500.0 ev/s
+[inject-physics] SWITCH at seq=4000 ts=1783791250713575862 (marker -> /mnt/e/AI_Projects/PHAROS/reports/phase3/injection_marker.json)
+[inject-physics] done: 4000 baseline + 6000 injected events sent
+[pdm-scorer] device=cuda:0 (NVIDIA GeForce RTX 2050, 4096 MiB) systems=['RFQ', 'DTL', 'CCL', 'SCL'] thresholds={'RFQ': 0.16369, 'DTL': 0.15205, 'CCL': 0.22748, 'SCL': 0.16057}
+[pdm-scorer] {
+  "stream": "pdm",
+  "n_messages": 224,
+  "n_kept": 4,
+  "keep_rate": 0.017857142857142856,
+  "throughput_msgs_per_sec": 18.94371001280961,
+  "latency_ms": {
+    "mean": 24.962842415178574,
+    "p50": 20.701535,
+    "p95": 25.8134943,
+    "p99": 178.80162377000048,
+    "max": 414.158385
+  },
+  "thresholds": {
+    "RFQ": 0.16369366645812988,
+    "DTL": 0.15205009281635284,
+    "CCL": 0.22748324275016785,
+    "SCL": 0.16056697070598602
+  },
+  "configured_percentile": 99.0,
+  "expected_background_keep_rate": 0.01,
+  "normal_pulses_seen": 224,
+  "normal_keep_rate": 0.017857142857142856,
+  "score_median": 0.02661349344998598
+}
+[retrain-trigger] armed: 3 consecutive physics score_psi windows at >=warn -> retrain (max 1); serving models/physics_vae thr=0.00112106
+[retrain-trigger] warn streak 1/3 (psi=0.155)
+[retrain-trigger] warn streak 2/3 (psi=0.154)
+[retrain-trigger] warn streak 3/3 (psi=0.170)
+[retrain] training -> /mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z (epochs=6, max_events=500000)
+[train-physics] device = cuda:0 (NVIDIA GeForce RTX 2050, 4096 MiB)
+[train-physics] loading background (max_events=500000) ...
+[train-physics] train=(450000, 57) val=(50000, 57)
+[train-physics] epoch   1/6 train=0.9902 val=1.0221 (rec=1.0150 kl=0.0071) mean_mu2=0.010 beta=0.200 4.6s
+[train-physics] epoch   2/6 train=0.9830 val=1.0170 (rec=1.0152 kl=0.0019) mean_mu2=0.002 beta=0.400 4.3s
+[train-physics] epoch   3/6 train=0.9825 val=1.0158 (rec=1.0152 kl=0.0006) mean_mu2=0.001 beta=0.600 3.8s
+[train-physics] epoch   4/6 train=0.9825 val=1.0156 (rec=1.0152 kl=0.0004) mean_mu2=0.000 beta=0.800 3.8s
+[train-physics] epoch   5/6 train=0.9823 val=1.0154 (rec=1.0152 kl=0.0002) mean_mu2=0.000 beta=1.000 4.8s
+[train-physics] epoch   6/6 train=0.9872 val=1.0153 (rec=1.0152 kl=0.0001) mean_mu2=0.000 beta=1.000 3.8s
+[train-physics] saved checkpoint -> /mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z/ckpt.pt
+[train-physics] train loss 0.9902 -> 0.9872
+[export-onnx] wrote /mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z/encoder_mu.onnx (57 -> mu[8], opset 13); zero-input mu[0]=0.00196938
+PHAROS Phase 2 -- ONNX export parity (PyTorch encoder vs onnxruntime)
+generated: 2026-07-11T17:35:23.009183+00:00
+model:     /mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z/encoder_mu.onnx
+sample:    2000 background events (held-out region 0.9-1.0)
+tolerance: 1e-05
+
+max |mu_pytorch - mu_onnx|            = 2.980e-08
+max |summu2_pytorch - summu2_onnx|    = 1.863e-09
+score range on sample: [6.724e-08, 2.993e-03]
+
+RESULT: PASS
+
+[thresholds] physics: n=100000 p99(Sum mu^2)=0.0000
+[eval-physics] device = cuda:0 (NVIDIA GeForce RTX 2050, 4096 MiB)
+[eval-physics] bg=100000 sig=55969 AUC_summu2(A->4l)=0.7755 AUC_recon=0.8890
+[eval-physics] wrote plots + metrics -> /mnt/e/AI_Projects/PHAROS/reports/phase3
+[retrain-trigger] SWAPPED -> /mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z thr=3.96642e-05 auc 0.7664866677089104 -> 0.7754602269113258
+[retrain-trigger] max retrains reached; exiting
+[retrain-trigger] done: 1 retrain(s)
+[physics-scorer-p2] hot-swap pointer: /mnt/e/AI_Projects/PHAROS/models/physics_vae/current.json (active=/mnt/e/AI_Projects/PHAROS/models/physics_vae)
+[physics-scorer-p2] backend=ort threshold(Sum mu^2)=0.00112106 -> events.physics.scored (forward_all=True)
+[physics-scorer-p2] {
+  "stream": "physics_ort",
+  "n_messages": 10000,
+  "n_kept": 51,
+  "keep_rate": 0.0051,
+  "throughput_msgs_per_sec": 481.0124134755047,
+  "latency_ms": {
+    "mean": 5.1959650702,
+    "p50": 4.7767775,
+    "p95": 7.675082849999999,
+    "p99": 8.941911180000002,
+    "max": 470.632178
+  },
+  "backend": "ort",
+  "threshold": 0.0011210612719878554,
+  "active_model_dir": "/mnt/e/AI_Projects/PHAROS/models/physics_vae",
+  "n_hot_swaps": 0,
+  "output_topic": "events.physics.scored",
+  "forward_all": true
+}
+[monitor] tracking ['phys_score', 'phys_f00', 'phys_f03', 'phys_f15', 'phys_f27', 'pdm_score_RFQ', 'pdm_score_DTL', 'pdm_score_CCL', 'pdm_score_SCL', 'pdm_ch00', 'pdm_ch05', 'pdm_ch10'] on ['events.physics', 'events.physics.scored', 'events.pdm.scored'] (psi warn=0.1 alert=0.25)
+[monitor] WARN pdm/RFQ score_psi=0.1327 (n=60)
+[monitor] WARN pdm/RFQ ch10_psi=0.1162 (n=60)
+[monitor] WARN pdm/RFQ score_psi=0.1195 (n=60)
+[monitor] WARN pdm/RFQ ch10_psi=0.1733 (n=60)
+[monitor] WARN pdm/RFQ score_psi=0.2195 (n=60)
+[monitor] WARN pdm/RFQ ch00_psi=0.2174 (n=60)
+[monitor] ALERT pdm/RFQ ch05_psi=0.3201 (n=60)
+[monitor] ALERT pdm/RFQ ch10_psi=0.2561 (n=60)
+[monitor] ALERT pdm/RFQ score_psi=0.2951 (n=60)
+[monitor] ALERT pdm/RFQ ch00_psi=0.3906 (n=60)
+[monitor] ALERT pdm/RFQ ch05_psi=0.4938 (n=60)
+[monitor] ALERT pdm/RFQ ch10_psi=0.5376 (n=60)
+[monitor] ALERT pdm/RFQ score_psi=1.5656 (n=60)
+[monitor] ALERT pdm/RFQ ch00_psi=0.5192 (n=60)
+[monitor] ALERT pdm/RFQ ch05_psi=1.2026 (n=60)
+[monitor] ALERT pdm/RFQ ch10_psi=0.3794 (n=60)
+[monitor] ALERT pdm/RFQ score_psi=1.3684 (n=60)
+[monitor] ALERT pdm/RFQ ch00_psi=1.3828 (n=60)
+[monitor] ALERT pdm/RFQ ch05_psi=1.4401 (n=60)
+[monitor] ALERT pdm/RFQ ch10_psi=0.3014 (n=60)
+[monitor] ALERT pdm/RFQ score_psi=0.3075 (n=60)
+[monitor] ALERT pdm/RFQ ch00_psi=1.3536 (n=60)
+[monitor] ALERT pdm/RFQ ch05_psi=1.5161 (n=60)
+[monitor] WARN pdm/RFQ ch10_psi=0.2428 (n=60)
+[monitor] ALERT pdm/RFQ score_psi=1.3697 (n=60)
+[monitor] ALERT pdm/RFQ ch00_psi=1.4572 (n=60)
+[monitor] ALERT pdm/RFQ ch05_psi=1.5747 (n=60)
+[monitor] ALERT pdm/RFQ ch10_psi=2.9549 (n=60)
+[monitor] WARN physics f27_psi=0.1071 (n=2000)
+[monitor] WARN physics f27_psi=0.2331 (n=2000)
+[monitor] WARN physics f00_psi=0.1211 (n=2000)
+[monitor] ALERT physics f27_psi=0.4198 (n=2000)
+[monitor] WARN physics score_psi=0.1550 (n=2000)
+[monitor] WARN physics f00_psi=0.1533 (n=2000)
+[monitor] ALERT physics f27_psi=0.4286 (n=2000)
+[monitor] WARN physics score_psi=0.1539 (n=2000)
+[monitor] WARN physics f00_psi=0.1392 (n=2000)
+[monitor] ALERT physics f27_psi=0.4283 (n=2000)
+[monitor] WARN physics score_psi=0.1695 (n=2000)
+[monitor] WARN physics f00_psi=0.1561 (n=2000)
+[monitor] ALERT physics f27_psi=0.4084 (n=2000)
+[monitor] WARN physics score_psi=0.1739 (n=2000)
+[monitor] WARN physics f00_psi=0.1443 (n=2000)
+[monitor] ALERT physics f27_psi=0.4117 (n=2000)
+[monitor] WARN physics score_psi=0.1996 (n=2000)
+[monitor] WARN physics f00_psi=0.1379 (n=2000)
+[monitor] ALERT physics f27_psi=0.3978 (n=2000)
+[monitor] WARN physics score_psi=0.1824 (n=2000)
+[monitor] WARN physics f00_psi=0.1471 (n=2000)
+[monitor] ALERT physics f27_psi=0.3738 (n=2000)
+[monitor] WARN physics score_psi=0.1720 (n=2000)
+[monitor] WARN physics f00_psi=0.1507 (n=2000)
+[monitor] ALERT physics f27_psi=0.4138 (n=2000)
+[monitor] WARN physics score_psi=0.1863 (n=2000)
+[monitor] WARN physics f00_psi=0.1526 (n=2000)
+[monitor] ALERT physics f27_psi=0.4380 (n=2000)
+[monitor] WARN physics score_psi=0.1637 (n=2000)
+[monitor] {
+  "generated": "2026-07-11T17:36:00.271547+00:00",
+  "consumed": {
+    "events.pdm.scored": 224,
+    "events.physics": 10000,
+    "events.physics.scored": 10000
+  },
+  "drift_events_emitted": 121,
+  "by_metric": [
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch00_psi",
+      "severity": "alert",
+      "count": 5
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch00_psi",
+      "severity": "ok",
+      "count": 3
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch00_psi",
+      "severity": "warn",
+      "count": 1
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch05_psi",
+      "severity": "alert",
+      "count": 6
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch05_psi",
+      "severity": "ok",
+      "count": 3
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch10_psi",
+      "severity": "alert",
+      "count": 5
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch10_psi",
+      "severity": "ok",
+      "count": 1
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch10_psi",
+      "severity": "warn",
+      "count": 3
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "score_psi",
+      "severity": "alert",
+      "count": 5
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "score_psi",
+      "severity": "ok",
+      "count": 1
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "score_psi",
+      "severity": "warn",
+      "count": 3
+    },
+    {
+      "stream": "physics",
+      "metric": "f00_psi",
+      "severity": "ok",
+      "count": 8
+    },
+    {
+      "stream": "physics",
+      "metric": "f00_psi",
+      "severity": "warn",
+      "count": 9
+    },
+    {
+      "stream": "physics",
+      "metric": "f03_psi",
+      "severity": "ok",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "f15_psi",
+      "severity": "ok",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "f27_psi",
+      "severity": "alert",
+      "count": 9
+    },
+    {
+      "stream": "physics",
+      "metric": "f27_psi",
+      "severity": "ok",
+      "count": 6
+    },
+    {
+      "stream": "physics",
+      "metric": "f27_psi",
+      "severity": "warn",
+      "count": 2
+    },
+    {
+      "stream": "physics",
+      "metric": "score_psi",
+      "severity": "ok",
+      "count": 8
+    },
+    {
+      "stream": "physics",
+      "metric": "score_psi",
+      "severity": "warn",
+      "count": 9
+    }
+  ]
+}
+[phase3-demo] streams idle; measuring outcomes...
+[lead-time] 291 drift events -> drift_events.json
+[lead-time] ALERT (f27_psi) after 4.02s / 2002 scored messages (first warn: f27_psi at 2.02s)
+[lead-time] wrote /mnt/e/AI_Projects/PHAROS/reports/phase3/drift_timeline.png
+[pdm-skew] {
+  "generated": "2026-07-11T17:36:21.537665+00:00",
+  "stream": "pdm/RFQ",
+  "injection_start_ts_ns": 1783791222225930362,
+  "inject_source": "hvcm/RFQ file-head slice (Phase 1 calibration skew, benign)",
+  "n_post_injection_evaluations": 24,
+  "score_metrics_fired": [
+    "score_psi"
+  ],
+  "feature_metrics_fired": [
+    "ch00_psi",
+    "ch05_psi",
+    "ch10_psi"
+  ],
+  "post_injection_max": {
+    "ch00_psi": 1.4571925221658377,
+    "ch05_psi": 1.5747266558036874,
+    "ch10_psi": 2.954926648443491,
+    "score_psi": 1.5655785853224893
+  },
+  "verdict": "real_shift_signature",
+  "note": "Both score AND raw-input drift fired: the monitor cannot distinguish this replay skew from a real shift on the metrics tracked -- documented limitation."
+}
+[phase3-demo] waiting for retrain trigger (trains on confirmed drift)...
+[phase3-demo] pointer written; verification replay on the swapped model:
+[physics-producer] sent 1000/2000
+[physics-producer] sent 2000/2000
+[physics-producer] 2000 events from data/raw/adc2021/background_for_training.h5 region=(0.9, 1.0) at 500.0 ev/s -> events.physics
+[physics-producer] done: 2000 events sent
+[physics-scorer-p2] hot-swap pointer: /mnt/e/AI_Projects/PHAROS/models/physics_vae/current.json (active=/mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z)
+[physics-scorer-p2] backend=ort threshold(Sum mu^2)=3.96642e-05 -> events.physics.scored (forward_all=True)
+[physics-scorer-p2] {
+  "stream": "physics_ort",
+  "n_messages": 2000,
+  "n_kept": 19,
+  "keep_rate": 0.0095,
+  "throughput_msgs_per_sec": 503.6881918117933,
+  "latency_ms": {
+    "mean": 5.3038348895,
+    "p50": 4.785685,
+    "p95": 8.08814075,
+    "p99": 19.00824003999999,
+    "max": 53.168287
+  },
+  "backend": "ort",
+  "threshold": 3.966420626966283e-05,
+  "active_model_dir": "/mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z",
+  "n_hot_swaps": 0,
+  "output_topic": "events.physics.scored",
+  "forward_all": true
+}
+[phase3-demo] done; reports in reports/phase3/

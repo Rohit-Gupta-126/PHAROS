@@ -1,0 +1,27 @@
+{
+  "background_path": "data/raw/adc2021/background_for_training.h5",
+  "out_dir": "/mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z",
+  "max_events": 500000,
+  "val_frac": 0.1,
+  "latent_dim": 8,
+  "hidden": [
+    32,
+    16
+  ],
+  "epochs": 6,
+  "batch_size": 1024,
+  "lr": 0.001,
+  "beta": 1.0,
+  "kl_warmup_epochs": 5,
+  "seed": 1337,
+  "device": null,
+  "amp": true,
+  "num_workers": 0,
+  "export_onnx": false,
+  "log_every": 1,
+  "signal_path": "data/raw/adc2021/Ato4l_lepFilter_13TeV_filtered.h5",
+  "signal_name": "A->4l",
+  "model_dir": "models/physics_vae",
+  "reports_dir": "reports/phase0",
+  "eval_events": 100000
+}
