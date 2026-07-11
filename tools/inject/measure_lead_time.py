@@ -20,8 +20,8 @@ from typing import Any, Dict, List
 from src.common.config import resolve_path
 from services import common
 
-# dataviz palette (light surface): series blue, status warning/critical.
-C_SERIES = "#2a78d6"
+# dataviz palette (light surface): categorical slots + status colors.
+SERIES = ["#2a78d6", "#1baf7a", "#eda100", "#008300", "#4a3aa7"]
 C_WARN = "#eda100"
 C_ALERT = "#d03b3b"
 C_MARKER = "#52514e"
@@ -38,16 +38,23 @@ def drain_topic(topic: str, bootstrap: str, idle: float = 5.0
 
 
 def plot_timeline(events: List[Dict[str, Any]], start_ts_ns: int,
-                  metric: str, out_png, warn: float, alert: float) -> None:
+                  stream: str, out_png, warn: float, alert: float) -> None:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    t = [(e["detected_ts_ns"] - start_ts_ns) / 1e9 for e in events]
-    v = [e["value"] for e in events]
+    metrics = sorted({e["metric"] for e in events})
     fig, ax = plt.subplots(figsize=(9, 4.5))
-    ax.plot(t, v, color=C_SERIES, linewidth=2, marker="o", markersize=4,
-            label=metric)
+    for metric, color in zip(metrics, SERIES):
+        pts = [e for e in events if e["metric"] == metric]
+        t = [(e["detected_ts_ns"] - start_ts_ns) / 1e9 for e in pts]
+        v = [e["value"] for e in pts]
+        ax.plot(t, v, color=color, linewidth=2, marker="o", markersize=4,
+                label=metric)
+        ax.annotate(metric, xy=(t[-1], v[-1]), xytext=(6, 0),
+                    textcoords="offset points", fontsize=8, color="#52514e",
+                    va="center")
+    ax.legend(fontsize=8, frameon=False, loc="upper left")
     ax.axhline(warn, color=C_WARN, linewidth=1.2, linestyle="--")
     ax.annotate(f"warn ({warn})", xy=(1, warn), xycoords=("axes fraction", "data"),
                 xytext=(-4, 4), textcoords="offset points", ha="right",
@@ -63,7 +70,7 @@ def plot_timeline(events: List[Dict[str, Any]], start_ts_ns: int,
                 color="#52514e")
     ax.set_xlabel("seconds since injection start")
     ax.set_ylabel("PSI")
-    ax.set_title(f"Drift timeline: {metric} vs frozen Phase 0 reference")
+    ax.set_title(f"Drift timeline ({stream}) vs frozen Phase 0 reference")
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", color="#e6e5e1", linewidth=0.6)
     ax.set_axisbelow(True)
@@ -78,7 +85,9 @@ def main(argv=None) -> None:
                    default="reports/phase3/injection_marker.json")
     p.add_argument("--stream", type=str, default="physics",
                    help="drift-event stream to match (physics or pdm/<SYS>)")
-    p.add_argument("--metric", type=str, default="score_psi")
+    p.add_argument("--metric", type=str, default=None,
+                   help="restrict to one metric (default: first alert on ANY "
+                        "metric of the stream counts as detection)")
     p.add_argument("--scored-topic", type=str, default="events.physics.scored")
     p.add_argument("--reports-dir", type=str, default="reports/phase3")
     p.add_argument("--bootstrap", type=str, default=common.BOOTSTRAP_DEFAULT)
@@ -95,7 +104,7 @@ def main(argv=None) -> None:
     print(f"[lead-time] {len(drift)} drift events -> drift_events.json")
 
     sel = [e for e in drift if e["stream"] == args.stream
-           and e["metric"] == args.metric]
+           and (args.metric is None or e["metric"] == args.metric)]
     first_alert = next((e for e in sel if e["severity"] == "alert"
                         and e["detected_ts_ns"] >= start), None)
     first_warn = next((e for e in sel if e["severity"] in ("warn", "alert")
@@ -103,7 +112,8 @@ def main(argv=None) -> None:
 
     result: Dict[str, Any] = {
         "generated": datetime.now(timezone.utc).isoformat(),
-        "stream": args.stream, "metric": args.metric,
+        "stream": args.stream,
+        "metric_filter": args.metric or "any",
         "injection_start_ts_ns": start,
         "inject_source": marker.get("inject_source"),
         "n_drift_events": len(sel),
@@ -121,20 +131,23 @@ def main(argv=None) -> None:
             "detected": True,
             "lead_time_s": (first_alert["detected_ts_ns"] - start) / 1e9,
             "lead_time_messages": n_msgs,
+            "alert_metric": first_alert["metric"],
             "first_alert": first_alert,
+            "first_warn_metric": first_warn["metric"],
             "first_warn_lead_s":
                 (first_warn["detected_ts_ns"] - start) / 1e9,
         })
-        print(f"[lead-time] ALERT after {result['lead_time_s']:.2f}s / "
-              f"{n_msgs} scored messages "
-              f"(first warn at {result['first_warn_lead_s']:.2f}s)")
+        print(f"[lead-time] ALERT ({first_alert['metric']}) after "
+              f"{result['lead_time_s']:.2f}s / {n_msgs} scored messages "
+              f"(first warn: {first_warn['metric']} at "
+              f"{result['first_warn_lead_s']:.2f}s)")
 
     (out / "lead_time.json").write_text(json.dumps(result, indent=2),
                                         encoding="utf-8")
     if sel:
         warn_thr = sel[0]["threshold_warn"]
         alert_thr = sel[0]["threshold_alert"]
-        plot_timeline(sel, start, args.metric, out / "drift_timeline.png",
+        plot_timeline(sel, start, args.stream, out / "drift_timeline.png",
                       warn_thr, alert_thr)
         print(f"[lead-time] wrote {out / 'drift_timeline.png'}")
 

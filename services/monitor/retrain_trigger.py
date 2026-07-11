@@ -71,7 +71,13 @@ def main(argv=None) -> None:
     p.add_argument("--pointer", type=str,
                    default="models/physics_vae/current.json")
     p.add_argument("--confirm", type=int, default=3,
-                   help="consecutive alert-severity score_psi windows needed")
+                   help="consecutive qualifying score_psi windows needed")
+    p.add_argument("--min-severity", choices=["warn", "alert"],
+                   default="alert",
+                   help="window severity that counts toward confirmation. "
+                        "'warn' suits shifts that plateau in the warn band "
+                        "(e.g. a mostly-background-like mixture); still "
+                        "requires --confirm consecutive windows")
     p.add_argument("--max-retrains", type=int, default=1,
                    help="stop after this many retrains (demo cooldown)")
     p.add_argument("--retrain-epochs", type=int, default=6)
@@ -88,9 +94,12 @@ def main(argv=None) -> None:
     old = {"model_dir": phys_cfg["model_dir"],
            "threshold": old_thr["physics"]["threshold"],
            "auc": _read_old_auc(phys_cfg)}
+    qualifying = ({"alert"} if args.min_severity == "alert"
+                  else {"warn", "alert"})
     print(f"[retrain-trigger] armed: {args.confirm} consecutive physics "
-          f"score_psi alerts -> retrain (max {args.max_retrains}); "
-          f"serving {old['model_dir']} thr={old['threshold']:.6g}")
+          f"score_psi windows at >={args.min_severity} -> retrain "
+          f"(max {args.max_retrains}); serving {old['model_dir']} "
+          f"thr={old['threshold']:.6g}")
 
     group = args.group or common.fresh_group("pharos-retrain")
     consumer = common.make_consumer(common.TOPIC_DRIFT, group, args.bootstrap,
@@ -101,10 +110,10 @@ def main(argv=None) -> None:
         for ev in common.consume_json(consumer, idle_timeout_s=args.idle):
             if ev.get("stream") != "physics" or ev.get("metric") != "score_psi":
                 continue
-            if ev["severity"] == "alert":
+            if ev["severity"] in qualifying:
                 streak += 1
-                print(f"[retrain-trigger] alert streak {streak}/{args.confirm} "
-                      f"(psi={ev['value']:.3f})")
+                print(f"[retrain-trigger] {ev['severity']} streak "
+                      f"{streak}/{args.confirm} (psi={ev['value']:.3f})")
             else:
                 streak = 0
             if streak < args.confirm:

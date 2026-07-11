@@ -34,7 +34,11 @@ python -m services.scorers.pdm_scorer --forward-all \
 PDM_PID=$!
 python -m services.monitor.drift_monitor --idle 35 &
 MON_PID=$!
-python -m services.monitor.retrain_trigger --max-retrains 1 --idle 60 &
+# --min-severity warn: the black-box mixture is mostly background-like, so
+# score PSI plateaus in the warn band (~0.15-0.20) rather than crossing 0.25;
+# sustained-window confirmation (3 consecutive) still applies.
+python -m services.monitor.retrain_trigger --max-retrains 1 --idle 60 \
+    --min-severity warn &
 RETRAIN_PID=$!
 sleep 5
 
