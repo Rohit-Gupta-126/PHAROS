@@ -35,7 +35,9 @@ def main(argv=None) -> None:
     p.add_argument("--thresholds", type=str, default="configs/thresholds.json")
     p.add_argument("--reports-dir", type=str, default="reports/phase1")
     p.add_argument("--bootstrap", type=str, default=common.BOOTSTRAP_DEFAULT)
-    p.add_argument("--group", type=str, default="pharos-pdm-scorer")
+    p.add_argument("--group", type=str, default=None,
+                   help="fixed consumer group (default: fresh per-run group "
+                        "starting at end-of-topic -- offset hygiene)")
     p.add_argument("--idle", type=float, default=15.0)
     p.add_argument("--device", type=str, default=None, choices=["cpu", "cuda"])
     args = p.parse_args(argv)
@@ -55,8 +57,10 @@ def main(argv=None) -> None:
     print(f"[pdm-scorer] device={describe_device(device)} systems="
           f"{list(thresholds)} thresholds={ {k: round(v, 5) for k, v in thresholds.items()} }")
 
-    consumer = common.make_consumer(common.TOPIC_PDM, args.group,
-                                    args.bootstrap)
+    group = args.group or common.fresh_group("pharos-pdm-scorer")
+    consumer = common.make_consumer(common.TOPIC_PDM, group,
+                                    args.bootstrap,
+                                    from_beginning=bool(args.group))
     producer = common.make_producer(args.bootstrap)
     stats = StreamStats("pdm")
     normal_total = 0

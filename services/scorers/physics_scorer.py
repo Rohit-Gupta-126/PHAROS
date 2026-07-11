@@ -47,7 +47,9 @@ def main(argv=None) -> None:
     p.add_argument("--thresholds", type=str, default="configs/thresholds.json")
     p.add_argument("--reports-dir", type=str, default="reports/phase1")
     p.add_argument("--bootstrap", type=str, default=common.BOOTSTRAP_DEFAULT)
-    p.add_argument("--group", type=str, default="pharos-physics-scorer")
+    p.add_argument("--group", type=str, default=None,
+                   help="fixed consumer group (default: fresh per-run group "
+                        "starting at end-of-topic -- offset hygiene)")
     p.add_argument("--batch", type=int, default=256)
     p.add_argument("--idle", type=float, default=15.0,
                    help="exit after this many seconds with no messages")
@@ -64,8 +66,10 @@ def main(argv=None) -> None:
           f"threshold(Sum mu^2)={threshold:.6g} "
           f"(p{thr_cfg['physics']['percentile']:g} background)")
 
-    consumer = common.make_consumer(common.TOPIC_PHYSICS, args.group,
-                                    args.bootstrap)
+    group = args.group or common.fresh_group("pharos-physics-scorer")
+    consumer = common.make_consumer(common.TOPIC_PHYSICS, group,
+                                    args.bootstrap,
+                                    from_beginning=bool(args.group))
     producer = common.make_producer(args.bootstrap)
     stats = StreamStats("physics")
     all_scores: List[float] = []

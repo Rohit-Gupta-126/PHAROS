@@ -133,7 +133,9 @@ def main(argv=None) -> None:
                    help="max kept fraction of each window's input (L1 budget)")
     p.add_argument("--reports-dir", type=str, default="reports/phase2")
     p.add_argument("--bootstrap", type=str, default=common.BOOTSTRAP_DEFAULT)
-    p.add_argument("--group", type=str, default="pharos-physics-decision")
+    p.add_argument("--group", type=str, default=None,
+                   help="fixed consumer group (default: fresh per-run group "
+                        "starting at end-of-topic -- offset hygiene)")
     p.add_argument("--idle", type=float, default=15.0)
     args = p.parse_args(argv)
 
@@ -143,7 +145,9 @@ def main(argv=None) -> None:
     print(f"[decision] threshold={threshold:.6g} window={args.window}s "
           f"budget_fraction={args.budget_fraction}")
 
-    consumer = common.make_consumer(TOPIC_SCORED, args.group, args.bootstrap)
+    group = args.group or common.fresh_group("pharos-physics-decision")
+    consumer = common.make_consumer(TOPIC_SCORED, group, args.bootstrap,
+                                    from_beginning=bool(args.group))
     producer = common.make_producer(args.bootstrap)
 
     def publish(decisions: List[Dict[str, Any]]) -> None:

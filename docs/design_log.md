@@ -200,3 +200,13 @@ deployment point), pipeline latency O(100 ns) at 200 MHz. QKeras QAT skipped
 (unmaintained on Keras-3-era stacks); post-training fixed-point suffices at
 `<24,8>`. Full Vitis HLS synthesis is a documented one-time recipe for a lab
 machine: `docs/hls4ml_synthesis.md`.
+
+## Phase 3 — MLOps / drift monitoring
+
+**Offset hygiene.** All timing/monitoring consumers (both scorers, the
+decision layer, and the new Phase 3 monitor) now default to a *fresh per-run
+consumer group* with `auto.offset.reset=latest`, i.e. they start at
+end-of-topic. Phases 1–2 saw the first run after a break drain stale backlog,
+which skewed latency and throughput stats. A fixed group can still be forced
+with `--group` (resumes from committed offsets, `earliest` on first use) for
+replay-style runs.

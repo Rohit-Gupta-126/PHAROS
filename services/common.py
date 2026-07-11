@@ -36,6 +36,17 @@ def new_event_id(prefix: str, seq: int) -> str:
     return f"{prefix}-{seq:08d}-{uuid.uuid4().hex[:8]}"
 
 
+def fresh_group(prefix: str) -> str:
+    """Per-run consumer group so ``auto.offset.reset=latest`` always applies.
+
+    Timing/monitoring consumers must start at end-of-topic: a fixed group
+    resumes from committed offsets and the first run after a break drains
+    stale backlog, skewing latency stats (seen in Phases 1-2). A fresh group
+    has no committed offsets, so ``latest`` wins every run.
+    """
+    return f"{prefix}-{uuid.uuid4().hex[:8]}"
+
+
 def make_producer(bootstrap: str = BOOTSTRAP_DEFAULT) -> Producer:
     return Producer({
         "bootstrap.servers": bootstrap,
