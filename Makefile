@@ -18,7 +18,9 @@ PDM_LIMIT ?= 150
 .PHONY: help setup train-physics eval-physics train-pdm eval-pdm phase0 smoke clean \
         up down thresholds produce-physics produce-pdm score-physics score-pdm phase1 \
         export-onnx verify-onnx sofie-probe bench-inference score-physics-p2 decision phase2 \
-        hls4ml-estimate
+        hls4ml-estimate \
+        reference-stats monitor score-pdm-p3 inject-physics inject-pdm lead-time pdm-skew \
+        retrain-trigger dashboard phase3
 
 help:
 	@echo "PHAROS Phase 0 targets:"
@@ -47,6 +49,17 @@ help:
 	@echo "  make decision         L1-budget decision layer -> anomalies.scouting"
 	@echo "  make phase2           broker up + scorer + decision end-to-end demo"
 	@echo "  make hls4ml-estimate  hls4ml conversion + C-emulation check (no Vivado)"
+	@echo "PHAROS Phase 3 targets (MLOps: drift monitor + closed retrain loop):"
+	@echo "  make reference-stats  frozen drift references from Phase 0 artifacts"
+	@echo "  make monitor          drift monitor: PSI/KS vs references -> alerts.drift"
+	@echo "  make score-pdm-p3     PDM scorer with --forward-all -> events.pdm.scored"
+	@echo "  make inject-physics   background then black-box mid-stream shift"
+	@echo "  make inject-pdm       normal-val then file-head calibration skew"
+	@echo "  make lead-time        detection lead time + drift timeline plot"
+	@echo "  make pdm-skew         benign-skew vs real-shift signature verdict"
+	@echo "  make retrain-trigger  confirmed drift -> retrain -> parity -> hot-swap"
+	@echo "  make dashboard        Streamlit live dashboard (host, reads topics)"
+	@echo "  make phase3           broker up + full drift/inject/retrain demo"
 
 setup:
 	$(PYTHON) -m pip install pytest pyyaml joblib
@@ -129,6 +142,38 @@ hls4ml-estimate:
 
 phase2: up
 	PHYS_RATE=$(PHYS_RATE) PHYS_LIMIT=$(PHYS_LIMIT) bash scripts/phase2_demo.sh
+
+# ---------------------------------------------------------------- Phase 3 ----
+
+reference-stats:
+	$(PYTHON) -m scripts.derive_reference_stats
+
+monitor:
+	$(PYTHON) -m services.monitor.drift_monitor
+
+score-pdm-p3:
+	$(PYTHON) -m services.scorers.pdm_scorer --forward-all --reports-dir reports/phase3
+
+inject-physics:
+	$(PYTHON) -m tools.inject.inject_physics --rate $(PHYS_RATE)
+
+inject-pdm:
+	$(PYTHON) -m tools.inject.inject_pdm --system RFQ --rate $(PDM_RATE)
+
+lead-time:
+	$(PYTHON) -m tools.inject.measure_lead_time
+
+pdm-skew:
+	$(PYTHON) -m tools.inject.analyze_pdm_skew
+
+retrain-trigger:
+	$(PYTHON) -m services.monitor.retrain_trigger --max-retrains 1
+
+dashboard:
+	$(PYTHON) -m streamlit run services/dashboard/app.py
+
+phase3: up
+	PHYS_RATE=$(PHYS_RATE) PDM_RATE=$(PDM_RATE) bash scripts/phase3_demo.sh
 
 clean:
 	rm -rf models/physics_vae models/pdm

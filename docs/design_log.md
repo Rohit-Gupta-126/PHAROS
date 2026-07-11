@@ -210,3 +210,42 @@ end-of-topic. Phases 1–2 saw the first run after a break drain stale backlog,
 which skewed latency and throughput stats. A fixed group can still be forced
 with `--group` (resumes from committed offsets, `earliest` on first use) for
 replay-style runs.
+
+**Drift statistics.** Hand-rolled PSI + scipy `ks_2samp` instead of
+alibi-detect/river: two well-understood statistics cover the need, and both
+libraries drag heavy/fragile dependency trees onto a Windows/WSL laptop. The
+reference is FROZEN at Phase 0: `scripts/derive_reference_stats.py` scores
+the same held-out samples the thresholds came from (seed 1337) and stores
+quantile-binned histograms (PSI, open-ended outer bins) plus a 2 000-sample
+subsample (KS + dashboard overlays). PSI 0.1/0.25 warn/alert bounds are the
+standard model-monitoring heuristics, not calibrated tests — stated as such.
+
+**Monitor honesty.** The monitor (`services/monitor/drift_monitor.py`) is
+marker-blind: injectors record the switch point to `ctrl.inject` + a marker
+file, and only the post-hoc `measure_lead_time.py` joins the two, so detection
+lead time is a real measurement, not a self-fulfilling one.
+
+**Benign skew vs real drift (the key claim).** `inject_pdm` reproduces the
+Phase 1 calibration mismatch on purpose (normal-val slice → file-head slice);
+`analyze_pdm_skew.py` classifies the signature: score-PSI-only ⇒
+`calibration_suspect` (model-view moved, raw channel means did not), score+
+feature PSI ⇒ indistinguishable from a real shift on the tracked metrics —
+whichever verdict the run produces is recorded as-is in
+`reports/phase3/pdm_skew_analysis.json`; no tuning until the demo looks clean.
+
+**Closed retrain loop.** `retrain_trigger` requires 3 *consecutive*
+alert-severity physics `score_psi` windows (never a single window), then runs
+train → ONNX export → parity gate (tol 1e-5) → p99 threshold + AUC eval into
+a NEW model dir, and only after parity passes writes the atomic pointer file
+`models/physics_vae/current.json` (`os.replace`; a file, not a symlink —
+Windows — and not a control topic — inspectable, restart-safe). The running
+scorer polls the pointer every 500 messages and keeps the old model on any
+load failure. Retrain is demo-scale (6 epochs / 500 k events vs Phase 0's
+20 / 2 M) so the loop closes in minutes on the 4 GB-VRAM laptop; a production
+system would retrain on freshly captured background, not a Phase 0 replay —
+recorded as a limitation.
+
+**Dashboard.** Streamlit on the host reading topics directly (no DB): one
+confluent-kafka consumer per background thread (client is not thread-safe),
+fresh latest-offset groups, bounded deques, 2 s fragment refresh. Grafana out
+of scope. Running containers remain Redpanda + Console only.
