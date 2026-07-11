@@ -1,0 +1,41 @@
+{
+  "generated": "2026-07-11T17:35:30.385314+00:00",
+  "retrains": [
+    {
+      "triggered_at": "2026-07-11T17:34:16.762442+00:00",
+      "trigger_event": {
+        "schema": "pharos.drift.v1",
+        "stream": "physics",
+        "detected_ts_ns": 1783791256756359285,
+        "metric": "score_psi",
+        "value": 0.16953270118875632,
+        "threshold_warn": 0.1,
+        "threshold_alert": 0.25,
+        "severity": "warn",
+        "window_n": 2000,
+        "window_start_ns": 1783791252741127089,
+        "window_end_ns": 1783791256748937438,
+        "current_mean": 0.015602070349573225,
+        "current_p50": 2.9921635767863384e-05,
+        "reference_mean": 0.020886335857480655,
+        "ks": {
+          "stat": 0.1435,
+          "pvalue": 2.2774502931496754e-18
+        }
+      },
+      "old": {
+        "model_dir": "models/physics_vae",
+        "threshold": 0.0011210612719878554,
+        "auc": 0.7664866677089104
+      },
+      "new_model_dir": "/mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z",
+      "retrain_epochs": 6,
+      "retrain_events": 500000,
+      "swapped": true,
+      "parity": "PASS",
+      "new_threshold": 3.966420626966283e-05,
+      "new_auc": 0.7754602269113258,
+      "old_auc": 0.7664866677089104
+    }
+  ]
+}

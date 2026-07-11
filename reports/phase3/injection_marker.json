@@ -1,0 +1,11 @@
+{
+  "schema": "pharos.inject_marker.v1",
+  "stream": "physics",
+  "inject_source": "data/raw/adc2021/BlackBox_13TeV_PU20.h5",
+  "start_ts_ns": 1783791250713575862,
+  "start_seq": 4000,
+  "baseline_events": 4000,
+  "inject_events": 6000,
+  "rate": 500.0,
+  "written": "2026-07-11T17:34:10.713601+00:00"
+}

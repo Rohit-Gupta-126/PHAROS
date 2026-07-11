@@ -1,0 +1,11 @@
+PHAROS Phase 2 -- ONNX export parity (PyTorch encoder vs onnxruntime)
+generated: 2026-07-11T17:35:23.009183+00:00
+model:     /mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z/encoder_mu.onnx
+sample:    2000 background events (held-out region 0.9-1.0)
+tolerance: 1e-05
+
+max |mu_pytorch - mu_onnx|            = 2.980e-08
+max |summu2_pytorch - summu2_onnx|    = 1.863e-09
+score range on sample: [6.724e-08, 2.993e-03]
+
+RESULT: PASS

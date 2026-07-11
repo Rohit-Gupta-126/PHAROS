@@ -1,0 +1,23 @@
+{
+  "generated": "2026-07-11T17:36:21.537665+00:00",
+  "stream": "pdm/RFQ",
+  "injection_start_ts_ns": 1783791222225930362,
+  "inject_source": "hvcm/RFQ file-head slice (Phase 1 calibration skew, benign)",
+  "n_post_injection_evaluations": 24,
+  "score_metrics_fired": [
+    "score_psi"
+  ],
+  "feature_metrics_fired": [
+    "ch00_psi",
+    "ch05_psi",
+    "ch10_psi"
+  ],
+  "post_injection_max": {
+    "ch00_psi": 1.4571925221658377,
+    "ch05_psi": 1.5747266558036874,
+    "ch10_psi": 2.954926648443491,
+    "score_psi": 1.5655785853224893
+  },
+  "verdict": "real_shift_signature",
+  "note": "Both score AND raw-input drift fired: the monitor cannot distinguish this replay skew from a real shift on the metrics tracked -- documented limitation."
+}

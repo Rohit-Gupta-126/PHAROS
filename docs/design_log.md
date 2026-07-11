@@ -249,3 +249,28 @@ recorded as a limitation.
 confluent-kafka consumer per background thread (client is not thread-safe),
 fresh latest-offset groups, bounded deques, 2 s fragment refresh. Grafana out
 of scope. Running containers remain Redpanda + Console only.
+
+**Phase 3 measured results (`make phase3`, 10 k physics events @500 ev/s,
+RFQ PDM skew @20 p/s).**
+- *Black-box injection*: first drift ALERT 4.02 s / 2 002 scored messages
+  after the switch — exactly one 2 000-event window, the monitor's resolution
+  floor. The alerting metric is the leading-jet-pT feature (`f27_psi` ≈ 0.42
+  sustained); score PSI plateaus in the warn band (~0.15–0.20) because the
+  black box is mostly background-like. The retrain trigger therefore runs
+  with `--min-severity warn` (justified in the demo script); confirmation is
+  still 3 consecutive windows.
+- *Closed loop*: confirmed drift → demo-scale retrain → ONNX parity PASS →
+  pointer swap. AUC (A→4l) 0.766 → 0.775, threshold re-derived at p99
+  (3.97e-05 — the retrained VAE has a different score scale, which is exactly
+  why the threshold travels with the model in the pointer). A verification
+  replay served the new model dir; no unverified model was ever swapped in.
+- *PDM skew verdict — the honest one*: `real_shift_signature`. The file-head
+  slice moved not only score PSI but ALL tracked raw channel-mean PSIs
+  (1.5–3.0): the Phase 1 "calibration skew" is not a model artifact — the
+  file head is genuinely a different input distribution than the normal-val
+  split. The monitor cannot (and arguably should not) call it benign; the
+  claimed score-only-vs-both signature did not separate these cases on this
+  data, and that limitation is recorded in
+  `reports/phase3/pdm_skew_analysis.json` rather than tuned away. What it
+  does establish: the Phase 1 keep-rate mismatch traces to real sampling
+  bias in the replay slice, not to a drifting model.

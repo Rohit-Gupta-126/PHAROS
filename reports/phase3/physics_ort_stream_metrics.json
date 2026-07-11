@@ -1,0 +1,20 @@
+{
+  "stream": "physics_ort",
+  "n_messages": 2000,
+  "n_kept": 19,
+  "keep_rate": 0.0095,
+  "throughput_msgs_per_sec": 503.6881918117933,
+  "latency_ms": {
+    "mean": 5.3038348895,
+    "p50": 4.785685,
+    "p95": 8.08814075,
+    "p99": 19.00824003999999,
+    "max": 53.168287
+  },
+  "backend": "ort",
+  "threshold": 3.966420626966283e-05,
+  "active_model_dir": "/mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z",
+  "n_hot_swaps": 0,
+  "output_topic": "events.physics.scored",
+  "forward_all": true
+}

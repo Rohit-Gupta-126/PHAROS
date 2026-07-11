@@ -26,27 +26,30 @@ POINTER="models/physics_vae/current.json"
 
 rm -f "$POINTER"   # start the demo blue/green-clean: Phase 0 model serves
 
+# Idle timeouts are generous (90 s): inject_physics spends up to a minute
+# loading the 4.2M-row black-box HDF5 before emitting, and nothing must exit
+# during that silence.
 python -m services.scorers.physics_scorer_sofie --backend ort --forward-all \
-    --model-pointer "$POINTER" --reports-dir reports/phase3 --idle 30 &
+    --model-pointer "$POINTER" --reports-dir reports/phase3 --idle 90 &
 PHYS_PID=$!
 python -m services.scorers.pdm_scorer --forward-all \
-    --reports-dir reports/phase3 --idle 30 &
+    --reports-dir reports/phase3 --idle 90 &
 PDM_PID=$!
-python -m services.monitor.drift_monitor --idle 35 &
+python -m services.monitor.drift_monitor --idle 95 &
 MON_PID=$!
 # --min-severity warn: the black-box mixture is mostly background-like, so
 # score PSI plateaus in the warn band (~0.15-0.20) rather than crossing 0.25;
 # sustained-window confirmation (3 consecutive) still applies.
-python -m services.monitor.retrain_trigger --max-retrains 1 --idle 60 \
+python -m services.monitor.retrain_trigger --max-retrains 1 --idle 120 \
     --min-severity warn &
 RETRAIN_PID=$!
 sleep 5
 
+echo "[phase3-demo] injecting pdm calibration skew..."
+python -m tools.inject.inject_pdm --system RFQ --rate "$PDM_RATE"
 echo "[phase3-demo] injecting physics black-box shift..."
 python -m tools.inject.inject_physics --rate "$PHYS_RATE" \
     --baseline "$BASELINE" --inject "$INJECT"
-echo "[phase3-demo] injecting pdm calibration skew..."
-python -m tools.inject.inject_pdm --system RFQ --rate "$PDM_RATE"
 
 wait "$PHYS_PID" "$PDM_PID" "$MON_PID"
 echo "[phase3-demo] streams idle; measuring outcomes..."

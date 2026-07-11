@@ -1,0 +1,30 @@
+{
+  "generated": "2026-07-11T17:36:07.837471+00:00",
+  "stream": "physics",
+  "metric_filter": "any",
+  "injection_start_ts_ns": 1783791250713575862,
+  "inject_source": "data/raw/adc2021/BlackBox_13TeV_PU20.h5",
+  "n_drift_events": 255,
+  "detected": true,
+  "lead_time_s": 4.020738524,
+  "lead_time_messages": 2002,
+  "alert_metric": "f27_psi",
+  "first_alert": {
+    "schema": "pharos.drift.v1",
+    "stream": "physics",
+    "detected_ts_ns": 1783791254734314386,
+    "metric": "f27_psi",
+    "value": 0.41976279045179066,
+    "threshold_warn": 0.1,
+    "threshold_alert": 0.25,
+    "severity": "alert",
+    "window_n": 2000,
+    "window_start_ns": 1783791250729373819,
+    "window_end_ns": 1783791254727433292,
+    "current_mean": 14.360499801635742,
+    "current_p50": 0.0,
+    "reference_mean": 33.211064498405456
+  },
+  "first_warn_metric": "f27_psi",
+  "first_warn_lead_s": 2.017274579
+}

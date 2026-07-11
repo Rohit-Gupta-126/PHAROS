@@ -1,0 +1,10 @@
+{
+  "schema": "pharos.inject_marker.v1",
+  "stream": "pdm/RFQ",
+  "inject_source": "hvcm/RFQ file-head slice (Phase 1 calibration skew, benign)",
+  "start_ts_ns": 1783791222225930362,
+  "baseline_events": 104,
+  "inject_events": 120,
+  "rate": 20.0,
+  "written": "2026-07-11T17:33:42.226004+00:00"
+}

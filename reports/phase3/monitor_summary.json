@@ -1,0 +1,131 @@
+{
+  "generated": "2026-07-11T17:36:00.271547+00:00",
+  "consumed": {
+    "events.pdm.scored": 224,
+    "events.physics": 10000,
+    "events.physics.scored": 10000
+  },
+  "drift_events_emitted": 121,
+  "by_metric": [
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch00_psi",
+      "severity": "alert",
+      "count": 5
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch00_psi",
+      "severity": "ok",
+      "count": 3
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch00_psi",
+      "severity": "warn",
+      "count": 1
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch05_psi",
+      "severity": "alert",
+      "count": 6
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch05_psi",
+      "severity": "ok",
+      "count": 3
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch10_psi",
+      "severity": "alert",
+      "count": 5
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch10_psi",
+      "severity": "ok",
+      "count": 1
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "ch10_psi",
+      "severity": "warn",
+      "count": 3
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "score_psi",
+      "severity": "alert",
+      "count": 5
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "score_psi",
+      "severity": "ok",
+      "count": 1
+    },
+    {
+      "stream": "pdm/RFQ",
+      "metric": "score_psi",
+      "severity": "warn",
+      "count": 3
+    },
+    {
+      "stream": "physics",
+      "metric": "f00_psi",
+      "severity": "ok",
+      "count": 8
+    },
+    {
+      "stream": "physics",
+      "metric": "f00_psi",
+      "severity": "warn",
+      "count": 9
+    },
+    {
+      "stream": "physics",
+      "metric": "f03_psi",
+      "severity": "ok",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "f15_psi",
+      "severity": "ok",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "f27_psi",
+      "severity": "alert",
+      "count": 9
+    },
+    {
+      "stream": "physics",
+      "metric": "f27_psi",
+      "severity": "ok",
+      "count": 6
+    },
+    {
+      "stream": "physics",
+      "metric": "f27_psi",
+      "severity": "warn",
+      "count": 2
+    },
+    {
+      "stream": "physics",
+      "metric": "score_psi",
+      "severity": "ok",
+      "count": 8
+    },
+    {
+      "stream": "physics",
+      "metric": "score_psi",
+      "severity": "warn",
+      "count": 9
+    }
+  ]
+}

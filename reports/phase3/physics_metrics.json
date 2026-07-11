@@ -1,0 +1,15 @@
+{
+  "auc_latent_summu2": 0.7754602269113258,
+  "auc_recon_mse": 0.8890424082081152,
+  "auc": 0.7754602269113258,
+  "score_note": "auc_latent_summu2 is the FPGA-cheap AXOL1TL-style trigger score (sum of squared latent means); auc_recon_mse is the full-VAE reconstruction-MSE accuracy reference. Both use the same checkpoint.",
+  "signal": "A->4l",
+  "n_background": 100000,
+  "n_signal": 55969,
+  "background_score_mean": 6.0116162785561755e-05,
+  "signal_score_mean": 0.19465740025043488,
+  "background_score_median": 1.458590986658237e-06,
+  "signal_score_median": 5.1180818445573095e-06,
+  "background_recon_mean": 0.8951402902603149,
+  "signal_recon_mean": 266.6415100097656
+}
