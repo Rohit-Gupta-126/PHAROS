@@ -1,0 +1,33 @@
+# Phase 3 drift-monitor configuration.
+#
+# Reference distributions are derived ONCE from the frozen Phase 0 artifacts
+# (make reference-stats) and never updated by the monitor itself -- the
+# reference is the contract, the stream is what drifts.
+
+# Raw physics input features to track for drift, by ADC2021 feature index
+# (57-dim vector: MET pt/eta/phi, then 4 e/gamma, 4 mu, 10 jets x pt/eta/phi).
+# MET pt (0), leading e/gamma pt (3), leading mu pt (15), leading jet pt (27):
+# the four hardest physics-object momenta -- where a new-physics or detector
+# shift shows first.
+physics_feature_indices: [0, 3, 15, 27]
+
+# PDM system whose per-channel means are tracked for drift (the injector
+# targets this system too).
+pdm_system: RFQ
+# HVCM waveform channels to track (per-pulse mean of each channel).
+pdm_channel_indices: [0, 5, 10]
+
+# Sliding current-window sizing (samples) and evaluation cadence.
+physics:
+  window: 2000        # scored events per drift window
+  step: 500           # evaluate every N new events once full
+pdm:
+  window: 60          # scored pulses per window (PDM stream is ~20 ev/s)
+  step: 20
+
+# PSI severities (model-monitoring heuristics, not calibrated tests).
+psi_warn: 0.10
+psi_alert: 0.25
+
+# Reference sample kept for the KS test / dashboard histograms (downsampled).
+reference_sample_size: 2000
