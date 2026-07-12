@@ -1,40 +1,7 @@
 {
-  "generated": "2026-07-12T00:30:13.162632+00:00",
-  "consumed": {
-    "events.physics": 10000,
-    "events.physics.scored": 10000
-  },
-  "drift_events_emitted": 85,
-  "by_metric": [
-    {
-      "stream": "physics",
-      "metric": "f00_psi",
-      "severity": "alert",
-      "count": 17
-    },
-    {
-      "stream": "physics",
-      "metric": "f03_psi",
-      "severity": "alert",
-      "count": 17
-    },
-    {
-      "stream": "physics",
-      "metric": "f15_psi",
-      "severity": "alert",
-      "count": 17
-    },
-    {
-      "stream": "physics",
-      "metric": "f27_psi",
-      "severity": "alert",
-      "count": 17
-    },
-    {
-      "stream": "physics",
-      "metric": "score_psi",
-      "severity": "alert",
-      "count": 17
-    }
-  ]
+  "generated": "2026-07-12T00:50:29.378215+00:00",
+  "consumed": {},
+  "drift_events_emitted": 0,
+  "by_metric": [],
+  "warning": "consumed 0 messages across all topics -- is the broker up and is a producer/scorer running? Summary is empty."
 }

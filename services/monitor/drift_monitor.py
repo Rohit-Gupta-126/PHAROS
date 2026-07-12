@@ -169,6 +169,7 @@ def main(argv=None) -> None:
     finally:
         producer.flush(30)
         consumer.close()
+        total_consumed = sum(n_seen.values())
         summary = {
             "generated": datetime.now(timezone.utc).isoformat(),
             "consumed": dict(n_seen),
@@ -177,6 +178,15 @@ def main(argv=None) -> None:
                 {"stream": s, "metric": m, "severity": sev, "count": c}
                 for (s, m, sev), c in sorted(sev_counts.items())],
         }
+        # Non-fatal here (unlike scripts/phase4_sim_vs_real.py, which aborts):
+        # the monitor is launched as a subprocess whose clean exit the demo /
+        # orchestration depend on, so we flag a hollow run in the summary
+        # rather than exiting non-zero and cascading a failure upstream.
+        if total_consumed == 0:
+            summary["warning"] = (
+                "consumed 0 messages across all topics -- is the broker up and "
+                "is a producer/scorer running? Summary is empty.")
+            print(f"[monitor] WARNING: {summary['warning']}")
         out = resolve_path(args.reports_dir)
         out.mkdir(parents=True, exist_ok=True)
         (out / "monitor_summary.json").write_text(

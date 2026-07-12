@@ -86,6 +86,15 @@ def main(argv=None) -> None:
     stop.set()
     drift_thread.join(timeout=5)
 
+    # Fail loudly on an empty/near-empty drift feed rather than writing a
+    # hollow report: this almost always means the broker is down or no
+    # scorer/producer ran, not a genuine "no drift" finding.
+    MIN_EVENTS = 10
+    n_drift = len(events)
+    if n_drift == 0:
+        sys.exit("[phase4] consumed 0 events -- is the broker up and is a "
+                 "producer/scorer running? Aborting without writing report.")
+
     # Aggregate: per (stream, metric), the peak + last PSI and its severity.
     per_metric: dict = defaultdict(lambda: {"n": 0, "max_psi": 0.0,
                                              "last_psi": 0.0, "severity": "ok",
@@ -120,6 +129,12 @@ def main(argv=None) -> None:
         "by_metric": [
             {"metric": k, **v} for k, v in worst],
     }
+    if n_drift < MIN_EVENTS:
+        report["warning"] = (
+            f"only {n_drift} drift evaluations consumed (< {MIN_EVENTS}); "
+            "results are statistically thin -- check that the scorer/monitor "
+            "and producer stayed up for the full stream.")
+        print(f"[phase4] WARNING: {report['warning']}")
     out = resolve_path(args.reports_dir)
     out.mkdir(parents=True, exist_ok=True)
     dest = out / "sim_vs_real_drift.json"

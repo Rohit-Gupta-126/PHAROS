@@ -348,3 +348,22 @@ a one-command demo, and a reproducibility note. A `README.md` now leads with the
 project thesis and the three headline findings (Σμ²-vs-recon gap, hls4ml
 precision→trigger-decision finding, the drift-separability negative result). No
 retraining in Phase 4 — the active model pointer is reused.
+
+**2026-07-12 — retrain-trigger severity: the honest default is `alert`.** The
+Phase 3 demo's near-background ADC2021 black-box injection is deliberately a
+mostly-background-like mixture. At the strict, conservative `--min-severity
+alert` setting it does **not** trigger retraining: the anomaly-**score** PSI
+peaks at only ~0.17, below the 0.25 alert line, so no window qualifies and the
+loop stays open. That is the *correct* behaviour — a near-background signal
+should not force a model swap on score-drift alone, and treating it as one would
+be manufacturing a false positive. We therefore make `alert` the default for
+both `services/monitor/retrain_trigger.py` and the demo
+(`RETRAIN_MIN_SEVERITY`, default `alert`). The demo can opt into sustained
+warn-band confirmation (`RETRAIN_MIN_SEVERITY=warn`, PSI plateaus ~0.15–0.20,
+3 consecutive windows) purely to *exhibit* the closed loop end-to-end, at the
+cost of higher false-positive risk — a demo convenience, now explicit rather
+than silent. Note for future work: for near-background anomalies, **feature
+drift is a better trigger signal than score drift** — in the same run the
+leading-jet-pT feature PSI hit 0.42 (a clean alert) while the score barely
+moved, so a feature-PSI-gated retrain confirmation would catch this class of
+shift that score-PSI alone misses.

@@ -22,6 +22,13 @@ PHYS_RATE="${PHYS_RATE:-500}"
 BASELINE="${BASELINE:-4000}"
 INJECT="${INJECT:-6000}"
 PDM_RATE="${PDM_RATE:-20}"
+# Retrain confirmation severity. Defaults to the honest/conservative "alert":
+# at that setting this near-background black-box signal does NOT trigger a
+# retrain (score PSI peaks ~0.17, below the 0.25 alert line) and the demo ends
+# in the "no hot-swap" branch -- that is the *correct* behaviour, documented in
+# docs/design_log.md (2026-07-12). To watch the closed loop actually swap a
+# model, opt into sustained warn-band drift: RETRAIN_MIN_SEVERITY=warn.
+RETRAIN_MIN_SEVERITY="${RETRAIN_MIN_SEVERITY:-alert}"
 POINTER="models/physics_vae/current.json"
 
 rm -f "$POINTER"   # start the demo blue/green-clean: Phase 0 model serves
@@ -37,11 +44,13 @@ python -m services.scorers.pdm_scorer --forward-all \
 PDM_PID=$!
 python -m services.monitor.drift_monitor --idle 95 &
 MON_PID=$!
-# --min-severity warn: the black-box mixture is mostly background-like, so
-# score PSI plateaus in the warn band (~0.15-0.20) rather than crossing 0.25;
-# sustained-window confirmation (3 consecutive) still applies.
+# The black-box mixture is mostly background-like, so score PSI plateaus in the
+# warn band (~0.15-0.20) rather than crossing the 0.25 alert line. At the
+# default --min-severity alert the loop stays open (conservative, honest); set
+# RETRAIN_MIN_SEVERITY=warn to confirm on sustained warn-band drift instead
+# (sustained-window confirmation, 3 consecutive, still applies).
 python -m services.monitor.retrain_trigger --max-retrains 1 --idle 120 \
-    --min-severity warn &
+    --min-severity "$RETRAIN_MIN_SEVERITY" &
 RETRAIN_PID=$!
 sleep 5
 
