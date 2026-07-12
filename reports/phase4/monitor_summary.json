@@ -1,0 +1,40 @@
+{
+  "generated": "2026-07-12T00:30:13.162632+00:00",
+  "consumed": {
+    "events.physics": 10000,
+    "events.physics.scored": 10000
+  },
+  "drift_events_emitted": 85,
+  "by_metric": [
+    {
+      "stream": "physics",
+      "metric": "f00_psi",
+      "severity": "alert",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "f03_psi",
+      "severity": "alert",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "f15_psi",
+      "severity": "alert",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "f27_psi",
+      "severity": "alert",
+      "count": 17
+    },
+    {
+      "stream": "physics",
+      "metric": "score_psi",
+      "severity": "alert",
+      "count": 17
+    }
+  ]
+}

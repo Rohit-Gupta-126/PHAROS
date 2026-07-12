@@ -10,10 +10,13 @@ producer interface as Phase 1 -- so the Kafka client stays on the host (matching
 "producers are host processes") and the ROOT image is not fattened with
 confluent-kafka.
 
-Memory: implicit MT is enabled and only the needed branches are read; ``--limit``
-caps the number of events materialized so the 12 GB WSL guest never OOMs. The
-source may be a local file (from ``fetch_nanoaod.sh``) or a ``root://`` URL that
-RDataFrame streams directly (no local copy).
+Memory: only the needed branches are read and ``--limit`` caps the number of
+events materialized (via ``RDataFrame.Range``) so the 12 GB WSL guest never OOMs.
+A capped run stays single-threaded because ``Range()`` and implicit MT are
+mutually exclusive in RDataFrame; a full-file ingest (``--limit 0``) enables
+implicit MT. The source is a **local file** written by ``fetch_nanoaod.sh``:
+``rootproject/root:latest`` no longer bundles an XRootD client, so ``root://``
+streaming is unavailable and we ingest the downloaded local copy.
 
 Run (in-container):
     python3 services/ingest_root/ingest_nanoaod.py \
@@ -63,7 +66,7 @@ def _met_branches(columns: set[str]) -> tuple[str, str]:
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--source", required=True,
-                   help="local .root path or root:// URL (Events tree)")
+                   help="local .root file path (Events tree)")
     p.add_argument("--tree", default="Events")
     p.add_argument("--out", default="data/interim/cms_events_57.npy")
     p.add_argument("--limit", type=int, default=50_000,
@@ -73,7 +76,11 @@ def main(argv=None) -> None:
     args = p.parse_args(argv)
 
     ROOT = _import_root()
-    if args.threads != 1:
+    # RDataFrame.Range() and implicit MT are mutually exclusive: Range() throws
+    # under ImplicitMT. A capped run (--limit > 0) uses Range(), so it stays
+    # single-threaded on purpose; only a full-file ingest (--limit == 0) enables
+    # implicit MT.
+    if args.limit == 0 and args.threads != 1:
         ROOT.EnableImplicitMT(args.threads if args.threads > 0 else 0)
 
     df = ROOT.RDataFrame(args.tree, args.source)

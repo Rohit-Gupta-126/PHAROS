@@ -1,18 +1,20 @@
 {
   "stream": "physics_ort",
-  "n_messages": 10000,
-  "n_kept": 99,
-  "keep_rate": 0.0099,
-  "throughput_msgs_per_sec": 501.13070022933255,
+  "n_messages": 6000,
+  "n_kept": 205,
+  "keep_rate": 0.034166666666666665,
+  "throughput_msgs_per_sec": 504.3154785314229,
   "latency_ms": {
-    "mean": 5.468780187299999,
-    "p50": 5.4860745,
-    "p95": 7.811837049999999,
-    "p99": 8.406451750000002,
-    "max": 61.40732
+    "mean": 6.380096288333334,
+    "p50": 6.047900500000001,
+    "p95": 8.805956750000002,
+    "p99": 10.498240900000003,
+    "max": 112.411802
   },
   "backend": "ort",
   "threshold": 0.0011210612719878554,
+  "active_model_dir": "/mnt/e/AI_Projects/PHAROS/models/physics_vae",
+  "n_hot_swaps": 0,
   "output_topic": "events.physics.scored",
   "forward_all": true
 }

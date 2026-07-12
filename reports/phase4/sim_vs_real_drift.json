@@ -1,0 +1,55 @@
+{
+  "schema": "pharos.sim_vs_real.v1",
+  "generated": "2026-07-12T00:30:14.172865+00:00",
+  "note": "CMS Open Data (real) streamed through the frozen Phase 0 sim-trained scorer + monitor. Drift here is the sim-to-real domain gap (different object composition than ADC2021 Delphes sim), reported as a finding -- NOT tuned away.",
+  "source_npy": "data/interim/cms_events_57.npy",
+  "events_streamed": 10000,
+  "drift_evaluations": 85,
+  "n_metrics_alert": 5,
+  "n_metrics_warn": 0,
+  "by_metric": [
+    {
+      "metric": "physics::f03_psi",
+      "n": 17,
+      "max_psi": 6.102978758137763,
+      "last_psi": 5.406417176132007,
+      "severity": "alert",
+      "last_ks": null
+    },
+    {
+      "metric": "physics::score_psi",
+      "n": 17,
+      "max_psi": 4.523985152508611,
+      "last_psi": 4.280650899047753,
+      "severity": "alert",
+      "last_ks": {
+        "stat": 0.8035,
+        "pvalue": 0.0
+      }
+    },
+    {
+      "metric": "physics::f15_psi",
+      "n": 17,
+      "max_psi": 2.6174138100097855,
+      "last_psi": 1.7122768682688074,
+      "severity": "alert",
+      "last_ks": null
+    },
+    {
+      "metric": "physics::f00_psi",
+      "n": 17,
+      "max_psi": 2.3979357387057263,
+      "last_psi": 2.3587897094268535,
+      "severity": "alert",
+      "last_ks": null
+    },
+    {
+      "metric": "physics::f27_psi",
+      "n": 17,
+      "max_psi": 2.259727953051007,
+      "last_psi": 1.5888757950868153,
+      "severity": "alert",
+      "last_ks": null
+    }
+  ]
+}

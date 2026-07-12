@@ -1,0 +1,37 @@
+{
+  "signal": "A->4l",
+  "model_dir": "/mnt/e/AI_Projects/PHAROS/models/physics_vae_r20260711T173416Z",
+  "n_background": 100000,
+  "n_signal": 55969,
+  "scores": {
+    "latent_summu2": {
+      "auc": 0.7754602269113258,
+      "note": "FPGA-cheap trigger score (Sum mu^2)",
+      "background": {
+        "median": 1.458590986658237e-06,
+        "mean": 6.0116162785561755e-05,
+        "p99": 3.9664169889874756e-05
+      },
+      "signal": {
+        "median": 5.1180818445573095e-06,
+        "mean": 0.19465740025043488,
+        "p99": 5.959526538848877
+      }
+    },
+    "recon_mse": {
+      "auc": 0.8890424082081152,
+      "note": "full-VAE reconstruction MSE (offline)",
+      "background": {
+        "median": 0.23136460781097412,
+        "mean": 0.8951402902603149,
+        "p99": 6.096706867218018
+      },
+      "signal": {
+        "median": 2.3047258853912354,
+        "mean": 266.6415100097656,
+        "p99": 5249.3330078125
+      }
+    }
+  },
+  "note": "Medians quoted alongside means: both scores are heavy-tailed and non-negative, so recon-MSE means are outlier-dominated."
+}

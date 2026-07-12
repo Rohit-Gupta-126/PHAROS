@@ -11,7 +11,7 @@ flow through the frozen sim-trained scorer and drift monitor unchanged.
 ```
 rootproject/root:latest (one-shot)            host (pharos env)
 ┌───────────────────────────────────┐         ┌──────────────────────────────┐
-│ fetch_nanoaod.sh   (xrdcp)         │         │ services/ingest_root/        │
+│ fetch_nanoaod.sh   (curl HTTPS)    │         │ services/ingest_root/        │
 │   → data/raw/cms_opendata/*.root   │         │   stream_cms.py              │
 │ ingest_nanoaod.py  (RDataFrame)    │  npy    │   replays (N,57) through the │
 │   Events tree → build 57-vectors   │────────►│   Phase 1 producer interface │
@@ -63,13 +63,33 @@ retune anything to close it.
 
 ## Memory safety on the 12 GB WSL guest
 
-- `ROOT.EnableImplicitMT()` — multithreaded event loop.
 - `RDataFrame.Range(--limit)` caps the number of events materialized (default
   50 000); only the needed branches are pulled via `AsNumpy`. Peak stays well
   under the guest budget because the full file is never held in memory — for a
   larger sample, lower `--limit` or ingest in ranges.
-- The source may be a **local file** (from `fetch_nanoaod.sh`) or a `root://`
-  URL that RDataFrame **streams** directly (no local multi-GB copy).
+- `Range()` and `ROOT.EnableImplicitMT()` are **mutually exclusive** in
+  RDataFrame (`Range` throws under implicit MT), so a capped run (`--limit > 0`)
+  runs **single-threaded** on purpose. Only a full-file ingest (`--limit 0`)
+  enables the multithreaded event loop. The 50 000-event cap is single-pass fast
+  regardless.
+- Ingestion reads a **local file** written by `fetch_nanoaod.sh`. We do **not**
+  stream `root://` directly: `rootproject/root:latest` no longer bundles an
+  XRootD client (no `xrdcp`, no `libXrdCl.so.3`), so both xrdcp and RDataFrame
+  `root://` streaming are unavailable. We fetch over HTTPS to a local copy first.
+
+## Fetching over HTTPS (`curl -k` + adler32)
+
+`fetch_nanoaod.sh` downloads the NanoAOD file with `curl` over HTTPS instead of
+`xrdcp`. Two rationale points, documented here and in the script:
+
+- **`curl -k`** — `eospublic.cern.ch` redirects to an EOS gateway whose TLS
+  chain is the CERN Grid CA, which is not in the ROOT image's default CA bundle.
+  Rather than install the CERN CA into the container, we skip TLS verification
+  and instead establish trust via the file checksum.
+- **adler32 integrity check** — after download the script recomputes the file's
+  adler32 and fails loudly (deleting the partial file) if it does not match the
+  value published in the Open Data record's file index. This is the real
+  integrity guarantee and does not depend on the TLS trust chain.
 
 ## Running it
 
@@ -83,7 +103,12 @@ make up
 make sim-vs-real        # → reports/phase4/sim_vs_real_drift.json
 ```
 
-The default source is a Run2016 UL NanoAODv9 `DoubleMuon` file; any NanoAOD with
-the standard `Electron/Muon/Jet/PuppiMET` branches works. If the default file is
-too large for the guest or the endpoint is unreachable, pick a smaller Open Data
-record (`CMS_NANOAOD_URL=…`) rather than grinding — the project stop-rule.
+The default source is the CMS Open Data **ZeroBias PFNano** file (record 31316,
+`/ZeroBias/Run2016G-UL2016_MiniAODv2_PFNanoAODv1`, ~1.05 GB). ZeroBias is an
+inclusive/unbiased minimum-bias sample (random bunch-crossing readout, no physics
+trigger) — the right basis for a sim-to-real domain-gap study, unlike a triggered
+primary dataset. It carries the standard `Electron/Muon/Jet/(Puppi)MET` branches
+plus PF candidates. Override with `CMS_NANOAOD_URL=…` (and `CMS_ADLER32=…`, or
+empty to skip the checksum) for a different file; if the endpoint is unreachable
+or the file is too large for the guest, pick a smaller Open Data record rather
+than grinding — the project stop-rule.
